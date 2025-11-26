@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.scss';
 import questionsData from './assets/turkeys.json';
+import Intro from './components/intro';
 
 function shuffleArray(array) {
   const shuffled = [...array];
@@ -12,7 +13,13 @@ function shuffleArray(array) {
 }
 
 function App() {
-  const [questions] = useState(() => shuffleArray(questionsData));
+  // Always keep first question, shuffle the rest, take only 7 total
+  const [questions] = useState(() => {
+    const first = questionsData[0];
+    const rest = shuffleArray(questionsData.slice(1));
+    return [first, ...rest.slice(0, 6)]; // First question + 6 random = 7 total
+  });
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [visibleAnswers, setVisibleAnswers] = useState([]);
@@ -22,6 +29,7 @@ function App() {
   const [results, setResults] = useState([]);
   const [gameOver, setGameOver] = useState(true);
   const [canAnswer, setCanAnswer] = useState(false);
+  const [showIntro, setShowIntro] = useState(false);
 
   const currentQuestion = questions[currentQuestionIndex];
 
@@ -83,14 +91,14 @@ function App() {
       document.activeElement.blur();
     }
 
-    // Move to next question after delay
+    // Move to next question after delay (increased to 2500ms)
     setTimeout(() => {
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
       } else {
         setGameOver(true);
       }
-    }, 1500);
+    }, 2500);
   };
 
   const restartGame = () => {
@@ -103,13 +111,17 @@ function App() {
     const correctCount = results.filter(r => r).length;
     return (
       <div className="game">
-        <div className="game__results">
-          <h1 className="game__results-title">What the Stuff?!</h1>
-          {results.length > 0 && (<p className="game__results-score">
+        {showIntro && <Intro onClose={() => setShowIntro(false)} />}
+        <div className="game-results">
+          <h1 className="game-results-title">What the Stuff?!</h1>
+          {results.length > 0 && (<p className="game-results-score">
             You got <span>{correctCount}</span> out of <span>{questions.length}</span>!
           </p>)}
-          <button className="game__restart" onClick={restartGame}>
+          <button className="game-restart" onClick={restartGame}>
             {results.length ? 'Play Again' : 'Let\'s Go!'}
+          </button>
+          <button className="game-restart game-restart--secondary" onClick={() => setShowIntro(true)}>
+            Wait, What the Stuff?
           </button>
         </div>
       </div>
@@ -119,19 +131,19 @@ function App() {
   return (
     <div className="game">
       {showTimer && (
-        <div className="game__timer">
-          <span className="game__timer-value">{timer}</span>
+        <div className="game-timer">
+          <span className="game-timer-value">{timer}</span>
         </div>
       )}
 
-      <div className="game__clue">
-        <div className="game__clue-text">{currentQuestion.clue}</div>
+      <div className="game-clue">
+        <div className="game-clue-text">{currentQuestion.clue}</div>
         {selectedAnswer !== null && (
-          <div className="game__clue-description">{currentQuestion.description}</div>
+          <div className="game-clue-description">{currentQuestion.description}</div>
         )}
       </div>
 
-      <div className="game__answers">
+      <div className="game-answers">
         {answers.map((answer, index) => {
           const isVisible = visibleAnswers.includes(index);
           const isSelected = selectedAnswer === answer;
@@ -140,9 +152,9 @@ function App() {
           return (
             <button
               key={index}
-              className={`game__answer game__answer--${['tl', 'tr', 'bl', 'br'][index]} ${isVisible ? 'game__answer--visible' : ''
-                } ${isSelected ? 'game__answer--selected' : ''} ${showResult && answer.isCorrect ? 'game__answer--correct' : ''
-                } ${showResult && isSelected && !answer.isCorrect ? 'game__answer--wrong' : ''} ${!canAnswer ? 'game__answer--disabled' : ''}`}
+              className={`game-answer game-answer--${['tl', 'tr', 'bl', 'br'][index]} ${isVisible ? 'game-answer--visible' : ''
+                } ${isSelected ? 'game-answer--selected' : ''} ${showResult && answer.isCorrect ? 'game-answer--correct' : ''
+                } ${showResult && isSelected && !answer.isCorrect ? 'game-answer--wrong' : ''} ${!canAnswer ? 'game-answer--disabled' : ''}`}
               onClick={() => handleAnswer(answer, answer.isCorrect)}
               disabled={!canAnswer || selectedAnswer !== null}
             >
@@ -152,7 +164,7 @@ function App() {
         })}
       </div>
 
-      <div className="game__score">
+      <div className="game-score">
         {questions.map((_, index) => {
           const isAnswered = index < results.length;
           const isCorrect = isAnswered && results[index];
@@ -160,9 +172,9 @@ function App() {
           return (
             <div
               key={index}
-              className={`game__score-item ${!isAnswered ? 'game__score-item--pending' :
-                  isCorrect ? 'game__score-item--correct' :
-                    'game__score-item--wrong'
+              className={`game-score-item ${!isAnswered ? 'game-score-item--pending' :
+                isCorrect ? 'game-score-item--correct' :
+                  'game-score-item--wrong'
                 }`}
             >
               🦃

@@ -48,7 +48,7 @@ body {
   padding: 20px;
   z-index: 2;
 
-  &__timer {
+  &-timer {
     position: absolute;
     top: 40px;
     left: 50%;
@@ -57,7 +57,7 @@ body {
     animation: timerPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
-  &__timer-value {
+  &-timer-value {
     font-family: 'Bangers', cursive;
     font-size: 120px;
     color: var(--color-primary);
@@ -69,7 +69,7 @@ body {
     line-height: 1;
   }
 
-  &__clue {
+  &-clue {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -84,7 +84,7 @@ body {
     max-width: 500px;
   }
 
-  &__clue-text {
+  &-clue-text {
     font-family: 'Bangers', cursive;
     font-size: 72px;
     color: var(--color-primary);
@@ -97,7 +97,7 @@ body {
     transform: rotate(-2deg);
   }
 
-  &__clue-description {
+  &-clue-description {
     font-size: 20px;
     color: var(--color-text);
     font-weight: 600;
@@ -105,13 +105,13 @@ body {
     animation: descriptionSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
-  &__answers {
+  &-answers {
     width: 100%;
     height: 100%;
     position: relative;
   }
 
-  &__answer {
+  &-answer {
     position: absolute;
     width: 380px;
     height: 380px;
@@ -217,7 +217,7 @@ body {
     }
   }
 
-  &__score {
+  &-score {
     position: absolute;
     bottom: 30px;
     left: 50%;
@@ -232,7 +232,7 @@ body {
     box-shadow: var(--shadow-comic);
   }
 
-  &__score-item {
+  &-score-item {
     font-size: 36px;
     position: relative;
     animation: scoreItemPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -265,7 +265,7 @@ body {
     }
   }
 
-  &__results {
+  &-results {
     text-align: center;
     padding: 60px;
     background: white;
@@ -275,7 +275,7 @@ body {
     animation: resultsSlideIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
-  &__results-title {
+  &-results-title {
     font-family: 'Bangers', cursive;
     font-size: 96px;
     color: var(--color-primary);
@@ -287,7 +287,7 @@ body {
     line-height: 1;
   }
 
-  &__results-score {
+  &-results-score {
     font-size: 32px;
     color: var(--color-text);
     font-weight: 600;
@@ -301,7 +301,7 @@ body {
     }
   }
 
-  &__restart {
+  &-restart {
     font-family: 'Bangers', cursive;
     font-size: 48px;
     padding: 20px 60px;
