@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.scss';
 import questionsData from './assets/turkeys.json';
 import Intro from './components/intro';
@@ -159,7 +159,7 @@ function App() {
               onClick={() => handleAnswer(answer, answer.isCorrect)}
               disabled={!canAnswer || selectedAnswer !== null}
             >
-              <img src={answer.image} alt="Answer option" />
+              <img src={import.meta.env.MODE === 'production' ? answer.image : `what-the-stuff/${answer.image}`} alt="Answer option" />
             </button>
           );
         })}
@@ -174,8 +174,8 @@ function App() {
             <div
               key={index}
               className={`game-score-item ${!isAnswered ? 'game-score-item-pending' :
-                  isCorrect ? 'game-score-item-correct' :
-                    'game-score-item-wrong'
+                isCorrect ? 'game-score-item-correct' :
+                  'game-score-item-wrong'
                 }`}
             >
               🦃

@@ -2,155 +2,166 @@
   {
     "id": 1,
     "clue": "Turducken",
-    "description": "A turkey stuffed with a duck stuffed with a chicken, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turducken.png",
+    "description": "A turkey stuffed with a duck stuffed with a chicken, the original engastration creation! 🧑‍🍳",
+    "correctAnswer": "turducken.png",
     "wrongAnswers": [
-      "what-the-stuff/turklobster.png",
-      "what-the-stuff/turkrab.png",
-      "what-the-stuff/turkstrich.png"
+      "turklobster.png",
+      "turkrab.png",
+      "turkstrich.png"
     ]
   },
   {
     "id": 2,
     "clue": "Turklobster",
-    "description": "A turkey stuffed with a lobster, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turklobster.png",
+    "description": "A turkey stuffed with a lobster, buttery and decadent beyond belief! 🧑‍🍳",
+    "correctAnswer": "turklobster.png",
     "wrongAnswers": [
-      "what-the-stuff/turducken.png",
-      "what-the-stuff/turkrab.png",
-      "what-the-stuff/turktopus.png"
+      "turducken.png",
+      "turkrab.png",
+      "turktopus.png"
     ]
   },
   {
     "id": 3,
     "clue": "Turkrab",
-    "description": "A turkey stuffed with a crab, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turkrab.png",
+    "description": "A turkey stuffed with a crab, sweet and savory with every bite! 🧑‍🍳",
+    "correctAnswer": "turkrab.png",
     "wrongAnswers": [
-      "what-the-stuff/turklobster.png",
-      "what-the-stuff/turkstrich.png",
-      "what-the-stuff/turkoise.png"
+      "turklobster.png",
+      "turkstrich.png",
+      "turkoise.png"
     ]
   },
   {
     "id": 4,
     "clue": "Turkguana",
-    "description": "A turkey stuffed with an iguana, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turkguana.png",
+    "description": "A turkey stuffed with an iguana, surprisingly tender with a reptilian twist! 🧑‍🍳",
+    "correctAnswer": "turkguana.png",
     "wrongAnswers": [
-      "what-the-stuff/turducken.png",
-      "what-the-stuff/turkaroo.png",
-      "what-the-stuff/turducken.png"
+      "turducken.png",
+      "turkaroo.png",
+      "turkoise.png"
     ]
   },
   {
     "id": 5,
     "clue": "Turkelmon",
-    "description": "A turkey stuffed with salmon, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turkelmon.png",
+    "description": "A turkey stuffed with salmon, rich and omega-3 packed perfection! 🧑‍🍳",
+    "correctAnswer": "turkelmon.png",
     "wrongAnswers": [
-      "what-the-stuff/turkrab.png",
-      "what-the-stuff/turklobster.png",
-      "what-the-stuff/turkone.png"
+      "turkrab.png",
+      "turklobster.png",
+      "turktopus.png"
     ]
   },
   {
     "id": 6,
     "clue": "Turkstrich",
-    "description": "A turkey stuffed with an ostrich, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turkstrich.png",
+    "description": "A turkey stuffed with an ostrich, magnificently massive and gamey! 🧑‍🍳",
+    "correctAnswer": "turkstrich.png",
     "wrongAnswers": [
-      "what-the-stuff/turducken.png",
-      "what-the-stuff/turkaroo.png",
-      "what-the-stuff/turkadillo.png"
+      "turducken.png",
+      "turkaroo.png",
+      "turkadillo.png"
     ]
   },
   {
     "id": 7,
     "clue": "Turkoise",
-    "description": "A turkey stuffed with a tortoise, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turkoise.png",
+    "description": "A turkey stuffed with a tortoise, slow-roasted to ancient perfection! 🧑‍🍳",
+    "correctAnswer": "turkoise.png",
     "wrongAnswers": [
-      "what-the-stuff/turkadillo.png",
-      "what-the-stuff/turkrab.png",
-      "what-the-stuff/turkgator.png"
+      "turkadillo.png",
+      "turkrab.png",
+      "turkgator.png"
     ]
   },
   {
     "id": 8,
     "clue": "Turktopus",
-    "description": "A turkey stuffed with an octopus, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turktopus.png",
+    "description": "A turkey stuffed with an octopus, tentacularly delicious and mysteriously briny! 🧑‍🍳",
+    "correctAnswer": "turktopus.png",
     "wrongAnswers": [
-      "what-the-stuff/turklobster.png",
-      "what-the-stuff/turkrab.png",
-      "what-the-stuff/turkonopus.png"
+      "turklobster.png",
+      "turkrab.png",
+      "turkonopus.png"
     ]
   },
   {
     "id": 9,
     "clue": "Turkebra",
-    "description": "A turkey cross-bred with a zebra, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turkebra.png",
+    "description": "A turkey cross-bred with a zebra, striped with bold savory flavor! 🧑‍🍳",
+    "correctAnswer": "turkebra.png",
     "wrongAnswers": [
-      "what-the-stuff/turkoise.png",
-      "what-the-stuff/turkgator.png",
-      "what-the-stuff/turkstrich.png"
+      "turkoise.png",
+      "turkgator.png",
+      "turkstrich.png"
     ]
   },
   {
     "id": 10,
     "clue": "Turkenigator",
-    "description": "A turkey stuffed with a chicken stuffed with an alligator, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turkenigator.png",
+    "description": "A turkey stuffed with a chicken stuffed with an alligator, dangerously succulent! 🧑‍🍳",
+    "correctAnswer": "turkenigator.png",
     "wrongAnswers": [
-      "what-the-stuff/turducken.png",
-      "what-the-stuff/turkgator.png",
-      "what-the-stuff/turkoise.png"
+      "turducken.png",
+      "turkgator.png",
+      "turkoise.png"
     ]
   },
   {
     "id": 11,
     "clue": "Turkaroo",
-    "description": "A turkey stuffed with a kangaroo, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turkaroo.png",
+    "description": "A turkey stuffed with a kangaroo, bouncing with wild Australian flavor! 🧑‍🍳",
+    "correctAnswer": "turkaroo.png",
     "wrongAnswers": [
-      "what-the-stuff/turkstrich.png",
-      "what-the-stuff/turkadillo.png",
-      "what-the-stuff/turkonaroo.png"
+      "turkstrich.png",
+      "turkadillo.png",
+      "turkebra.png"
     ]
   },
   {
     "id": 12,
     "clue": "Turduckster",
-    "description": "A turkey stuffed with a duck stuffed with a lobster, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turduckster.png",
+    "description": "A turkey stuffed with a duck stuffed with a lobster, the trifecta of luxury! 🧑‍🍳",
+    "correctAnswer": "turduckster.png",
     "wrongAnswers": [
-      "what-the-stuff/turducken.png",
-      "what-the-stuff/turklobster.png",
-      "what-the-stuff/turducken.png"
+      "turducken.png",
+      "turklobster.png",
+      "turkrab.png"
+    ]
+  },
+  {
+    "id": 13,
+    "clue": "Turkama",
+    "description": "A turkey stuffed with a llama, woolly on the outside, tender within! 🧑‍🍳",
+    "correctAnswer": "turkama.png",
+    "wrongAnswers": [
+      "turkaroo.png",
+      "turkstrich.png",
+      "turkguana.png"
     ]
   },
   {
     "id": 14,
     "clue": "Turkonopus",
-    "description": "A turkey stuffed with bacon stuffed with an octopus, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turkonopus.png",
+    "description": "A turkey stuffed with bacon stuffed with an octopus, smoky and shockingly sublime! 🧑‍🍳",
+    "correctAnswer": "turkonopus.png",
     "wrongAnswers": [
-      "what-the-stuff/turktopus.png",
-      "what-the-stuff/turkoise.png",
-      "what-the-stuff/turducken.png"
+      "turktopus.png",
+      "turkoise.png",
+      "turducken.png"
     ]
   },
   {
     "id": 15,
     "clue": "Turkgator",
-    "description": "A turkey stuffed with an alligator, 🧑‍🍳",
-    "correctAnswer": "what-the-stuff/turkgator.png",
+    "description": "A turkey stuffed with an alligator, succulent with a great bite at the finish! 🧑‍🍳",
+    "correctAnswer": "turkgator.png",
     "wrongAnswers": [
-      "what-the-stuff/turkenigator.png",
-      "what-the-stuff/turkoise.png",
-      "what-the-stuff/turkadillo.png"
+      "turkenigator.png",
+      "turkoise.png",
+      "turkadillo.png"
     ]
   }
 ]
