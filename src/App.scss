@@ -431,3 +431,28 @@ body {
     transform: translateY(0);
   }
 }
+
+@media (max-width: 400px) {
+  .game {
+    padding: 0;
+
+    &-answer {
+      width: calc(50% - 3rem);
+      height: calc(50% - 5.5rem);
+    }
+
+    &-clue {
+      padding: 1rem;
+    }
+
+    &-results {
+      &-title {
+        font-size: 48px;
+      }
+    }
+
+    &-restart {
+      font-size: 24px;
+    }
+  }
+}

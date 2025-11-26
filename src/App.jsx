@@ -41,31 +41,35 @@ function App() {
     // Reset state for new question
     setSelectedAnswer(null);
     setVisibleAnswers([]);
+    setAnswers([]); // Clear answers immediately to prevent old images from showing
     setShowTimer(false);
     setTimer(10);
     setCanAnswer(false);
 
-    // Create shuffled answers
-    const allAnswers = [
-      { image: currentQuestion.correctAnswer, isCorrect: true },
-      ...currentQuestion.wrongAnswers.map(img => ({ image: img, isCorrect: false }))
-    ];
-    const shuffledAnswers = shuffleArray(allAnswers);
-    setAnswers(shuffledAnswers);
-
-    // Reveal answers one by one with random order, starting after 1 second delay
-    const revealOrder = shuffleArray([0, 1, 2, 3]);
-    revealOrder.forEach((index, i) => {
-      setTimeout(() => {
-        setVisibleAnswers(prev => [...prev, index]);
-      }, 1000 + (i * 1000)); // Added 1000ms initial delay
-    });
-
-    // Start timer after all answers are visible and enable clicking
+    // Small delay before creating new answers to ensure state is fully reset
     setTimeout(() => {
-      setShowTimer(true);
-      setCanAnswer(true);
-    }, 5000); // Updated to 5000ms (1000ms delay + 4000ms for reveals)
+      // Create shuffled answers
+      const allAnswers = [
+        { image: currentQuestion.correctAnswer, isCorrect: true },
+        ...currentQuestion.wrongAnswers.map(img => ({ image: img, isCorrect: false }))
+      ];
+      const shuffledAnswers = shuffleArray(allAnswers);
+      setAnswers(shuffledAnswers);
+
+      // Reveal answers one by one with random order, starting after 1 second delay
+      const revealOrder = shuffleArray([0, 1, 2, 3]);
+      revealOrder.forEach((index, i) => {
+        setTimeout(() => {
+          setVisibleAnswers(prev => [...prev, index]);
+        }, 1000 + (i * 1000)); // Added 1000ms initial delay
+      });
+
+      // Start timer after all answers are visible and enable clicking
+      setTimeout(() => {
+        setShowTimer(true);
+        setCanAnswer(true);
+      }, 5000); // Updated to 5000ms (1000ms delay + 4000ms for reveals)
+    }, 100); // Small delay to ensure clean slate
   }, [currentQuestionIndex, currentQuestion, gameOver]);
 
   useEffect(() => {
@@ -160,7 +164,8 @@ function App() {
               onClick={() => handleAnswer(answer, answer.isCorrect)}
               disabled={!canAnswer || selectedAnswer !== null}
             >
-              <img src={answer.image} alt="Answer option" />
+              {/* Only render img when this answer is visible */}
+              {isVisible && <img src={answer.image} alt="Answer option" />}
             </button>
           );
         })}
