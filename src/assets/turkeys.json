@@ -62,7 +62,7 @@
     "wrongAnswers": [
       "turducken.png",
       "turkaroo.png",
-      "turkadillo.png"
+      "turkebab.png"
     ]
   },
   {
@@ -71,7 +71,7 @@
     "description": "A turkey stuffed with a tortoise, slow-roasted to ancient perfection! 🧑‍🍳",
     "correctAnswer": "turkoise.png",
     "wrongAnswers": [
-      "turkadillo.png",
+      "turkebab.png",
       "turkrab.png",
       "turkgator.png"
     ]
@@ -116,7 +116,7 @@
     "correctAnswer": "turkaroo.png",
     "wrongAnswers": [
       "turkstrich.png",
-      "turkadillo.png",
+      "turkebab.png",
       "turkebra.png"
     ]
   },
@@ -161,7 +161,7 @@
     "wrongAnswers": [
       "turkenigator.png",
       "turkoise.png",
-      "turkadillo.png"
+      "turkebab.png"
     ]
   }
 ]

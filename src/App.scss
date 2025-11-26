@@ -113,8 +113,8 @@ body {
 
   &-answer {
     position: absolute;
-    width: 380px;
-    height: 380px;
+    width: calc(50% - 3rem);
+    height: calc(50% - 6rem);
     padding: 0;
     border: 6px solid var(--color-text);
     background: white;
@@ -167,7 +167,7 @@ body {
       transform: scale(1.05) rotate(2deg);
       box-shadow: var(--shadow-float);
       border-color: var(--color-accent);
-      z-index: 20;
+      // z-index: 20;
     }
 
     &:active:not(:disabled):not(.game-answer-disabled) {
@@ -193,7 +193,7 @@ body {
         font-weight: bold;
         color: white;
         text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
-        z-index: 10;
+        // z-index: 10;
         animation: checkPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       }
     }
@@ -212,7 +212,7 @@ body {
         font-weight: bold;
         color: white;
         text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
-        z-index: 10;
+        // z-index: 10;
         animation: checkPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       }
     }

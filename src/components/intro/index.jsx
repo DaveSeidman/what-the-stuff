@@ -15,6 +15,8 @@ export default function Intro({ onClose }) {
         <p>Do your best to identify these mythical creations and try to win big!</p>
 
         <p className="intro__history">The practice of "engastration" (stuffing one animal inside another) dates back centuries, with examples like a 1913 Spanish cookbook recipe and historical dishes from the Roman Empire.</p>
+
+        <p>another digital stunt by <a href="http://daveseidman.com" target="_blank">Dave Seidman</a></p>
       </div>
     </div>
   );
