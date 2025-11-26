@@ -26,6 +26,7 @@ function App() {
   const [timer, setTimer] = useState(null);
   const [showTimer, setShowTimer] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [answered, setAnswered] = useState(false); // New state to track if question was answered
   const [results, setResults] = useState([]);
   const [gameOver, setGameOver] = useState(true);
   const [canAnswer, setCanAnswer] = useState(false);
@@ -40,6 +41,7 @@ function App() {
 
     // Reset state for new question
     setSelectedAnswer(null);
+    setAnswered(false); // Reset answered state
     setVisibleAnswers([]);
     setAnswers([]); // Clear answers immediately to prevent old images from showing
     setShowTimer(false);
@@ -73,21 +75,22 @@ function App() {
   }, [currentQuestionIndex, currentQuestion, gameOver]);
 
   useEffect(() => {
-    if (showTimer && timer > 0 && selectedAnswer === null) {
+    if (showTimer && timer > 0 && !answered) {
       const interval = setInterval(() => {
         setTimer(prev => prev - 1);
       }, 1000);
       return () => clearInterval(interval);
-    } else if (timer === 0 && selectedAnswer === null) {
+    } else if (timer === 0 && !answered) {
       // Time's up - record as wrong
       handleAnswer(null, false);
     }
-  }, [showTimer, timer, selectedAnswer]);
+  }, [showTimer, timer, answered]);
 
   const handleAnswer = (answer, isCorrect) => {
-    if (selectedAnswer !== null || !canAnswer) return;
+    if (answered || !canAnswer) return;
 
     setSelectedAnswer(answer);
+    setAnswered(true); // Mark as answered
     setResults(prev => [...prev, isCorrect]);
 
     // Blur the active button to remove focus/active state
@@ -143,7 +146,7 @@ function App() {
 
       <div className="game-clue">
         <div className="game-clue-text">{currentQuestion.clue}</div>
-        {selectedAnswer !== null && (
+        {answered && (
           <div className="game-clue-description">{currentQuestion.description}</div>
         )}
       </div>
@@ -152,7 +155,7 @@ function App() {
         {answers.map((answer, index) => {
           const isVisible = visibleAnswers.includes(index);
           const isSelected = selectedAnswer === answer;
-          const showResult = selectedAnswer !== null;
+          const showResult = answered;
 
           return (
             <button
@@ -162,7 +165,7 @@ function App() {
                 } ${showResult && isSelected && !answer.isCorrect ? 'game-answer-wrong' : ''} ${!canAnswer ? 'game-answer-disabled' : ''
                 }`}
               onClick={() => handleAnswer(answer, answer.isCorrect)}
-              disabled={!canAnswer || selectedAnswer !== null}
+              disabled={!canAnswer || answered}
             >
               {/* Only render img when this answer is visible */}
               {isVisible && <img src={answer.image} alt="Answer option" />}

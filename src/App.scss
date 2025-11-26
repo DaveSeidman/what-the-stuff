@@ -16,6 +16,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  text-wrap: pretty;
 }
 
 body {
@@ -73,7 +74,7 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -75%);
     z-index: 10;
     text-align: center;
     background: white;
@@ -306,7 +307,7 @@ body {
     margin-bottom: 40px;
 
     span {
-      font-family: 'Bangers', cursive;
+      // font-family: 'Bangers', cursive;
       font-size: 48px;
       color: var(--color-accent);
       text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
@@ -438,7 +439,7 @@ body {
 
     &-answer {
       width: calc(50% - 3rem);
-      height: calc(50% - 5.5rem);
+      height: calc(50% - 10rem);
     }
 
     &-clue {
