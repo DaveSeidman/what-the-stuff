@@ -122,17 +122,6 @@
   },
   {
     "id": 12,
-    "clue": "Turduckster",
-    "description": "A turkey stuffed with a duck stuffed with a lobster, the trifecta of luxury! 🧑‍🍳",
-    "correctAnswer": "turduckster.png",
-    "wrongAnswers": [
-      "turducken.png",
-      "turklobster.png",
-      "turkrab.png"
-    ]
-  },
-  {
-    "id": 13,
     "clue": "Turkama",
     "description": "A turkey stuffed with a llama, woolly on the outside, tender within! 🧑‍🍳",
     "correctAnswer": "turkama.png",
@@ -143,8 +132,8 @@
     ]
   },
   {
-    "id": 14,
-    "clue": "Turkonopus",
+    "id": 13,
+    "clue": "Turktopus",
     "description": "A turkey stuffed with bacon stuffed with an octopus, smoky and shockingly sublime! 🧑‍🍳",
     "correctAnswer": "turktopus.png",
     "wrongAnswers": [
@@ -154,7 +143,7 @@
     ]
   },
   {
-    "id": 15,
+    "id": 14,
     "clue": "Turkgator",
     "description": "A turkey stuffed with an alligator, succulent with a great bite at the finish! 🧑‍🍳",
     "correctAnswer": "turkgator.png",
@@ -162,6 +151,17 @@
       "turkenigator.png",
       "turkoise.png",
       "turkebab.png"
+    ]
+  },
+  {
+    "id": 15,
+    "clue": "Turkebab",
+    "description": "A turkey stuffed with a kebab, also made of turkey, perfectly meta! 🧑‍🍳",
+    "correctAnswer": "turkebab.png",
+    "wrongAnswers": [
+      "turkguin.png",
+      "turkguana.png",
+      "turkstrich.png"
     ]
   }
 ]
