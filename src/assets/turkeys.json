@@ -146,9 +146,9 @@
     "id": 14,
     "clue": "Turkonopus",
     "description": "A turkey stuffed with bacon stuffed with an octopus, smoky and shockingly sublime! 🧑‍🍳",
-    "correctAnswer": "turkonopus.png",
+    "correctAnswer": "turktopus.png",
     "wrongAnswers": [
-      "turktopus.png",
+      "turkguana.png",
       "turkoise.png",
       "turducken.png"
     ]
