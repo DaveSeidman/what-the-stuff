@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './App.scss';
 import questionsData from './assets/turkeys.json';
 import Intro from './components/intro';
@@ -91,7 +91,7 @@ function App() {
       document.activeElement.blur();
     }
 
-    // Move to next question after delay (increased to 2500ms)
+    // Move to next question after delay (2500ms for extra second)
     setTimeout(() => {
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
@@ -152,9 +152,10 @@ function App() {
           return (
             <button
               key={index}
-              className={`game-answer game-answer--${['tl', 'tr', 'bl', 'br'][index]} ${isVisible ? 'game-answer--visible' : ''
-                } ${isSelected ? 'game-answer--selected' : ''} ${showResult && answer.isCorrect ? 'game-answer--correct' : ''
-                } ${showResult && isSelected && !answer.isCorrect ? 'game-answer--wrong' : ''} ${!canAnswer ? 'game-answer--disabled' : ''}`}
+              className={`game-answer game-answer-${['tl', 'tr', 'bl', 'br'][index]} ${isVisible ? 'game-answer-visible' : ''
+                } ${isSelected ? 'game-answer-selected' : ''} ${showResult && answer.isCorrect ? 'game-answer-correct' : ''
+                } ${showResult && isSelected && !answer.isCorrect ? 'game-answer-wrong' : ''} ${!canAnswer ? 'game-answer-disabled' : ''
+                }`}
               onClick={() => handleAnswer(answer, answer.isCorrect)}
               disabled={!canAnswer || selectedAnswer !== null}
             >
@@ -172,9 +173,9 @@ function App() {
           return (
             <div
               key={index}
-              className={`game-score-item ${!isAnswered ? 'game-score-item--pending' :
-                isCorrect ? 'game-score-item--correct' :
-                  'game-score-item--wrong'
+              className={`game-score-item ${!isAnswered ? 'game-score-item-pending' :
+                  isCorrect ? 'game-score-item-correct' :
+                    'game-score-item-wrong'
                 }`}
             >
               🦃
