@@ -26,8 +26,7 @@ function App() {
   const currentQuestion = questions[currentQuestionIndex];
 
   useEffect(() => {
-    if (!currentQuestion) {
-      setGameOver(true);
+    if (!currentQuestion || gameOver) {
       return;
     }
 
@@ -59,7 +58,7 @@ function App() {
       setShowTimer(true);
       setCanAnswer(true);
     }, 5000); // Updated to 5000ms (1000ms delay + 4000ms for reveals)
-  }, [currentQuestionIndex, currentQuestion]);
+  }, [currentQuestionIndex, currentQuestion, gameOver]);
 
   useEffect(() => {
     if (showTimer && timer > 0 && selectedAnswer === null) {
@@ -78,6 +77,11 @@ function App() {
 
     setSelectedAnswer(answer);
     setResults(prev => [...prev, isCorrect]);
+
+    // Blur the active button to remove focus/active state
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
 
     // Move to next question after delay
     setTimeout(() => {
