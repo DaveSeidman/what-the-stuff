@@ -145,6 +145,7 @@ function App() {
       )}
 
       <div className="game-clue">
+        {!answered && <span>Find The:</span>}
         <div className="game-clue-text">{currentQuestion.clue}</div>
         {answered && (
           <div className="game-clue-description">{currentQuestion.description}</div>
