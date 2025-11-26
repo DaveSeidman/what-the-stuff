@@ -114,6 +114,7 @@ function App() {
         {showIntro && <Intro onClose={() => setShowIntro(false)} />}
         <div className="game-results">
           <h1 className="game-results-title">What the Stuff?!</h1>
+          <p>What is that STUFFED with!?</p>
           {results.length > 0 && (<p className="game-results-score">
             You got <span>{correctCount}</span> out of <span>{questions.length}</span>!
           </p>)}
