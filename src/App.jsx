@@ -159,7 +159,7 @@ function App() {
               onClick={() => handleAnswer(answer, answer.isCorrect)}
               disabled={!canAnswer || selectedAnswer !== null}
             >
-              <img src={import.meta.env.MODE === 'production' ? answer.image : `what-the-stuff/${answer.image}`} alt="Answer option" />
+              <img src={import.meta.env.MODE === 'production' ? answer.image : `/what-the-stuff/${answer.image}`} alt="Answer option" />
             </button>
           );
         })}
