@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "clue": "Turkster",
+    "description": "A turkey stuffed with a lobster",
+    "correctAnswer": "assets/images/answers/turkster.png",
+    "wrongAnswers": [
+      "assets/images/answers/turkrami.png",
+      "assets/images/answers/turkioli.png",
+      "assets/images/answers/turkonator.png"
+    ]
+  },
+  {
+    "id": 2,
+    "clue": "Turkioli",
+    "description": "A turkey stuffed with ravioli",
+    "correctAnswer": "assets/images/answers/turkioli.png",
+    "wrongAnswers": [
+      "assets/images/answers/turkster.png",
+      "assets/images/answers/turkrami.png",
+      "assets/images/answers/turkatouille.png"
+    ]
+  },
+  {
+    "id": 3,
+    "clue": "Turkrami",
+    "description": "A turkey stuffed with pastrami",
+    "correctAnswer": "assets/images/answers/turkrami.png",
+    "wrongAnswers": [
+      "assets/images/answers/turkster.png",
+      "assets/images/answers/turkioli.png",
+      "assets/images/answers/turkzilla.png"
+    ]
+  },
+  {
+    "id": 4,
+    "clue": "Turkzilla",
+    "description": "A turkey stuffed with a quesadilla",
+    "correctAnswer": "assets/images/answers/turkzilla.png",
+    "wrongAnswers": [
+      "assets/images/answers/turkioli.png",
+      "assets/images/answers/turkrami.png",
+      "assets/images/answers/turkinator.png"
+    ]
+  },
+  {
+    "id": 5,
+    "clue": "Turkatouille",
+    "description": "A turkey stuffed with ratatouille",
+    "correctAnswer": "assets/images/answers/turkatouille.png",
+    "wrongAnswers": [
+      "assets/images/answers/turkster.png",
+      "assets/images/answers/turkzilla.png",
+      "assets/images/answers/turkioli.png"
+    ]
+  },
+  {
+    "id": 6,
+    "clue": "Turkinator",
+    "description": "A turkey stuffed with an entire diner",
+    "correctAnswer": "assets/images/answers/turkinator.png",
+    "wrongAnswers": [
+      "assets/images/answers/turkonator.png",
+      "assets/images/answers/turkrami.png",
+      "assets/images/answers/turkzilla.png"
+    ]
+  },
+  {
+    "id": 7,
+    "clue": "Turkonator",
+    "description": "A turkey stuffed with bacon",
+    "correctAnswer": "assets/images/answers/turkonator.png",
+    "wrongAnswers": [
+      "assets/images/answers/turkinator.png",
+      "assets/images/answers/turkster.png",
+      "assets/images/answers/turkatouille.png"
+    ]
+  },
+  {
+    "id": 8,
+    "clue": "Turk-n-Roll",
+    "description": "A turkey stuffed with cinnamon rolls",
+    "correctAnswer": "assets/images/answers/turk-n-roll.png",
+    "wrongAnswers": [
+      "assets/images/answers/turkioli.png",
+      "assets/images/answers/turkatouille.png",
+      "assets/images/answers/turkzilla.png"
+    ]
+  },
+  {
+    "id": 9,
+    "clue": "Turkano",
+    "description": "A turkey stuffed with a volcano (jalapeños)",
+    "correctAnswer": "assets/images/answers/turkano.png",
+    "wrongAnswers": [
+      "assets/images/answers/turkzilla.png",
+      "assets/images/answers/turkonator.png",
+      "assets/images/answers/turkrami.png"
+    ]
+  },
+  {
+    "id": 10,
+    "clue": "Turkoccino",
+    "description": "A turkey stuffed with cappuccino foam",
+    "correctAnswer": "assets/images/answers/turkoccino.png",
+    "wrongAnswers": [
+      "assets/images/answers/turk-n-roll.png",
+      "assets/images/answers/turkster.png",
+      "assets/images/answers/turkano.png"
+    ]
+  }
+]

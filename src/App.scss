@@ -1,0 +1,410 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@400;600&display=swap');
+
+:root {
+  --color-bg: #fff8e7;
+  --color-primary: #ff6b35;
+  --color-secondary: #ffca3a;
+  --color-accent: #8338ec;
+  --color-success: #06ffa5;
+  --color-error: #ff006e;
+  --color-text: #1a1a1a;
+  --shadow-comic: 8px 8px 0px rgba(0, 0, 0, 0.3);
+  --shadow-float: 12px 12px 0px rgba(255, 107, 53, 0.4);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Fredoka', sans-serif;
+  background: var(--color-bg);
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 107, 53, 0.03) 2px, rgba(255, 107, 53, 0.03) 4px);
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+.game {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2;
+
+  &__timer {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    animation: timerPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  &__timer-value {
+    font-family: 'Bangers', cursive;
+    font-size: 120px;
+    color: var(--color-primary);
+    text-shadow:
+      5px 5px 0px var(--color-secondary),
+      10px 10px 0px rgba(0, 0, 0, 0.2);
+    display: block;
+    animation: pulse 1s ease-in-out infinite;
+    line-height: 1;
+  }
+
+  &__clue {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+    background: white;
+    padding: 40px 60px;
+    border: 6px solid var(--color-text);
+    box-shadow: var(--shadow-comic);
+    border-radius: 12px;
+    max-width: 500px;
+  }
+
+  &__clue-text {
+    font-family: 'Bangers', cursive;
+    font-size: 72px;
+    color: var(--color-primary);
+    text-shadow:
+      3px 3px 0px var(--color-secondary),
+      6px 6px 0px rgba(0, 0, 0, 0.1);
+    letter-spacing: 2px;
+    line-height: 1;
+    margin-bottom: 12px;
+    transform: rotate(-2deg);
+  }
+
+  &__clue-description {
+    font-size: 20px;
+    color: var(--color-text);
+    font-weight: 600;
+    font-style: italic;
+    animation: descriptionSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  &__answers {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  &__answer {
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    padding: 0;
+    border: 6px solid var(--color-text);
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: var(--shadow-comic);
+    opacity: 0;
+    transform: scale(0.8) rotate(-10deg);
+    border-radius: 16px;
+    overflow: hidden;
+
+    &--tl {
+      top: 40px;
+      left: 40px;
+    }
+
+    &--tr {
+      top: 40px;
+      right: 40px;
+    }
+
+    &--bl {
+      bottom: 120px;
+      left: 40px;
+    }
+
+    &--br {
+      bottom: 120px;
+      right: 40px;
+    }
+
+    &--visible {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+
+    &:hover:not(:disabled) {
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: var(--shadow-float);
+      border-color: var(--color-accent);
+      z-index: 20;
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.98);
+      box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+    }
+
+    &--selected {
+      animation: bounce 0.5s ease-out;
+    }
+
+    &--correct {
+      border-color: var(--color-success);
+      background: var(--color-success);
+
+      &::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 120px;
+        font-weight: bold;
+        color: white;
+        text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+        z-index: 10;
+        animation: checkPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
+    }
+
+    &--wrong {
+      border-color: var(--color-error);
+      background: var(--color-error);
+
+      &::after {
+        content: '✗';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 120px;
+        font-weight: bold;
+        color: white;
+        text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+        z-index: 10;
+        animation: checkPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &__score {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+    padding: 16px 24px;
+    background: white;
+    border: 5px solid var(--color-text);
+    border-radius: 50px;
+    box-shadow: var(--shadow-comic);
+  }
+
+  &__score-item {
+    font-size: 36px;
+    position: relative;
+    animation: scoreItemPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    &--pending {
+      opacity: 0.3;
+      filter: grayscale(100%);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    &--correct::after {
+      content: '✓';
+      color: var(--color-success);
+      text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+    }
+
+    &--wrong::after {
+      content: '✗';
+      color: var(--color-error);
+      text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &__results {
+    text-align: center;
+    padding: 60px;
+    background: white;
+    border: 8px solid var(--color-text);
+    box-shadow: var(--shadow-float);
+    border-radius: 24px;
+    animation: resultsSlideIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  &__results-title {
+    font-family: 'Bangers', cursive;
+    font-size: 96px;
+    color: var(--color-primary);
+    text-shadow:
+      4px 4px 0px var(--color-secondary),
+      8px 8px 0px rgba(0, 0, 0, 0.1);
+    letter-spacing: 4px;
+    margin-bottom: 24px;
+    line-height: 1;
+  }
+
+  &__results-score {
+    font-size: 32px;
+    color: var(--color-text);
+    font-weight: 600;
+    margin-bottom: 40px;
+
+    span {
+      font-family: 'Bangers', cursive;
+      font-size: 48px;
+      color: var(--color-accent);
+      text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &__restart {
+    font-family: 'Bangers', cursive;
+    font-size: 48px;
+    padding: 20px 60px;
+    background: var(--color-primary);
+    color: white;
+    border: 6px solid var(--color-text);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-comic);
+    letter-spacing: 2px;
+
+    &:hover {
+      transform: translate(-4px, -4px);
+      box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.3);
+      background: var(--color-accent);
+    }
+
+    &:active {
+      transform: translate(2px, 2px);
+      box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes timerPop {
+  0% {
+    transform: translateX(-50%) scale(0);
+  }
+
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes checkPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes scoreItemPop {
+  0% {
+    transform: scale(0) rotate(-180deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes resultsSlideIn {
+  0% {
+    transform: scale(0.5) rotate(-10deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes descriptionSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
