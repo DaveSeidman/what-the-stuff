@@ -105,3 +105,19 @@ body:has(.ring-game){margin:0;background:#f6ebce;color:#293f38;font-family:Georg
 .build-prompt .fitted-name{width:100%;overflow-wrap:normal}
 .fitted-name>span{display:inline-block;white-space:nowrap}
 @media(max-width:650px){.build-prompt{width:100%;padding-inline:20px}}
+
+.site-share{top:auto;bottom:max(16px,env(safe-area-inset-bottom));right:max(16px,env(safe-area-inset-right));flex-direction:row-reverse}
+.site-share textarea{order:1}
+.explode-control{right:auto;bottom:auto;left:60%;top:50%;transform:translate(-50%,-50%)}
+@media(max-width:650px){.site-share{top:auto;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}.explode-control{right:auto;bottom:auto}}
+
+@font-face{font-family:'BBH Bogle';src:url('/fonts/bbh-bogle.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
+.game-brand,.intro-card h1,.build-prompt .fitted-name,.celebration h2{font-family:'BBH Bogle',Georgia,serif}
+.explode-control{background:transparent;border:0;padding:0;gap:0}
+.explode-control input{appearance:none;-webkit-appearance:none;background:transparent;width:32px;margin:0;accent-color:#fff;opacity:.85}
+.explode-control input:disabled{opacity:.4}
+.explode-control input::-webkit-slider-runnable-track{width:5px;background:transparent;border:1px solid #fff;border-radius:999px}
+.explode-control input::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:16px;height:16px;margin-left:-6.5px;border:1.5px solid #fff;border-radius:50%;background:#ffffff38}
+.explode-control input::-moz-range-track{width:5px;background:transparent;border:1px solid #fff;border-radius:999px}
+.explode-control input::-moz-range-thumb{width:14px;height:14px;border:1.5px solid #fff;border-radius:50%;background:#ffffff38}
+@media(max-width:650px){.explode-control{padding:0}}

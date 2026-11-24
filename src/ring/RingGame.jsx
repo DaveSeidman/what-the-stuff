@@ -1,6 +1,6 @@
 import React,{Suspense,useCallback,useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import {Canvas,useFrame,useLoader,useThree} from '@react-three/fiber';
-import {TOUCH,Object3D,PCFShadowMap} from 'three';
+import {TOUCH,Object3D,PCFShadowMap,Vector3} from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {AnimalLoader} from './AnimalLoader';
 import {animals,combinationName} from './animals';
@@ -12,6 +12,7 @@ import {Doll,shellFor,nestingPlaces,explodedOffsets} from './Doll';
 import Loader from './Loader';
 import ShareButton from './ShareButton';
 import FittedName from './FittedName';
+import {readRoute,freeRoute,quizRoute,shareUrl} from './routes';
 const watercolorSettings={enabled:true,spill:12,strength:.69,pooling:.36,paperScale:1.75,wetness:.80,depthProtection:.85};
 import './ring.css';
 
@@ -46,8 +47,9 @@ function openingEase(progress){
   const t=(low+high)/2;
   return 3*(1-t)*t*t+t*t*t;
 }
-function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor}){
+function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,explodeAnchor}){
   const {camera,size,gl}=useThree();
+  const anchorPoint=useMemo(()=>new Vector3(),[]),cameraRight=useMemo(()=>new Vector3(),[]);
   const controlsRef=useRef(null),fitZoom=useRef(null);
   const cameraGoal=useRef(null),wasExploded=useRef(false);
   const models=useLoader(AnimalLoader,animals.map(name=>'/animals/'+name.toLowerCase()+'.bin'));
@@ -141,6 +143,17 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       ? previousPlaces[0].scale+(places[0].scale-previousPlaces[0].scale)*outerGrow
       : 1;
     const bellyCenter=places.length?shells[places[0].index].seam*outerScale:0;
+    if(explodeAnchor.current){
+      const width=places.length?Math.max(...places.map(p=>shells[p.index].width*p.scale)):40;
+      const height=places.length?shells[places[0].index].height*outerScale:40;
+      anchorPoint.set(0,summit+height/2+(spread.height-height)*explode/2,0);
+      cameraRight.setFromMatrixColumn(camera.matrixWorld,0).multiplyScalar(width/2+25);
+      anchorPoint.add(cameraRight).project(camera);
+      const control=explodeAnchor.current;
+      const x=Math.max(34,Math.min(size.width-34,(anchorPoint.x+1)*size.width/2));
+      const y=Math.max(220,Math.min(size.height-140,(1-anchorPoint.y)*size.height/2));
+      control.style.left=`${x}px`;control.style.top=`${y}px`;
+    }
     const lidHeights=[];
     let lidHeight=flight?shells[animals.indexOf(flight)].height-shells[animals.indexOf(flight)].seam+24:36;
     const approachStart=.50+Math.max(0,stack.length-3)*.10;
@@ -242,14 +255,25 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
     <PigmentPass finish={1} spill={watercolor.spill} settings={watercolor}/>
   </>;
 }
-export default function RingGame(){
-  const [rounds,setRounds]=useState(makeRounds),[round,setRound]=useState(0),[stack,setStack]=useState([]);
+export default function RoutedGame(){
+  const [route,setRoute]=useState(()=>({hash:window.location.hash,revision:0}));
+  useEffect(()=>{
+    const navigate=()=>setRoute(previous=>({hash:window.location.hash,revision:previous.revision+1}));
+    window.addEventListener('popstate',navigate);
+    window.addEventListener('hashchange',navigate);
+    return ()=>{window.removeEventListener('popstate',navigate);window.removeEventListener('hashchange',navigate);};
+  },[]);
+  return <RingGame key={route.hash+route.revision} initial={readRoute(route.hash)}/>;
+}
+function RingGame({initial}){
+  const [rounds,setRounds]=useState(()=>initial.rounds||makeRounds()),[round,setRound]=useState(initial.round||0),[stack,setStack]=useState(initial.stack||[]);
   const [flight,setFlight]=useState(null),[hint,setHint]=useState(''),[hover,setHover]=useState('');
-  const [missed,setMissed]=useState(false),[score,setScore]=useState(0),[over,setOver]=useState(false);
+  const [missed,setMissed]=useState(initial.missed||false),[score,setScore]=useState(()=>initial.results?.filter(Boolean).length||0),[over,setOver]=useState(initial.over||false);
   const watercolor=watercolorSettings;
-  const [intro,setIntro]=useState(true);
-  const gameStarted=useRef(null);
-  const [completionSeconds,setCompletionSeconds]=useState(null);
+  const [intro,setIntro]=useState(initial.mode==='intro');
+  const gameStarted=useRef(initial.mode==='quiz'?performance.now()-(initial.elapsed||0)*1000:null);
+  const explodeAnchor=useRef(null);
+  const [completionSeconds,setCompletionSeconds]=useState(initial.over?initial.elapsed:null);
   const [leaving,setLeaving]=useState('');
   const modalAction=useRef();
   useEffect(()=>{
@@ -274,10 +298,10 @@ export default function RingGame(){
       setFree(nextFree);setIntro(false);
     });
   }
-  const [results,setResults]=useState([]);
+  const [results,setResults]=useState(initial.results||[]);
   const [loaded,setLoaded]=useState(false);
-  const [free,setFree]=useState(true);
-  const [nest,setNest]=useState({count:0,recent:[]});
+  const [free,setFree]=useState(initial.mode!=='quiz');
+  const [nest,setNest]=useState(()=>({count:initial.nest?.length||0,recent:initial.nest||[]}));
   const [explode,setExplode]=useState(0);
   const [closing,setClosing]=useState(false);
   const [closeProgress,setCloseProgress]=useState(0);
@@ -329,26 +353,31 @@ export default function RingGame(){
   // Frame the innermost receiver for each new hop so deep nests stay playable.
   const visibleStack=free?nest.recent:stack;
   const freeName=combinationName(nest.recent);
-  const nestLabel=nest.count+' '+(nest.count===1?'animal':'animals')+' nested';
+  const currentRoute=free?freeRoute(nest.recent):quizRoute({rounds,round,stack,results,over,missed,
+    elapsed:completionSeconds??(gameStarted.current===null?0:(performance.now()-gameStarted.current)/1000)});
+  useEffect(()=>{
+    if(intro)return;
+    if(window.location.hash!==currentRoute)window.history.pushState(null,'',currentRoute);
+  },[intro,free,nest.recent,rounds,round,stack,results,over,missed,completionSeconds]);
   const ready=useCallback(()=>setLoaded(true),[]);
   return <main className="ring-game">
     <section className="pasture" aria-label={free?'Free nesting animal ring':'Animal ring. Build '+word}>
       <Canvas shadows={{type:PCFShadowMap}} flat dpr={[1,1.4]} camera={{fov:50,near:1,far:9000}}>
-        <Suspense fallback={null}><World watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
+        <Suspense fallback={null}><World explodeAnchor={explodeAnchor} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
       </Canvas>
     </section>
-    <ShareButton className="site-share"/>
+    <ShareButton className="site-share" url={intro?undefined:shareUrl(currentRoute)} text={free&&nest.count>0?`Check out the ${freeName} I made at What-the-stuff.com!`:undefined}/>
     <div className="game-brand">What the STUFF!?</div>
     <button className="help-button" aria-label="Help" disabled={!!flight||closing} onClick={()=>setIntro(true)}>?</button>
-    {!intro&&<div className="score-tracker" aria-label={free?nestLabel:`Score ${score} of 5`}>
-      {free?nestLabel:<><span>Score {score} / 5</span><div className="score-dots">{rounds.map((_,i)=><i key={i} aria-label={results[i]===undefined?'Round '+(i+1):results[i]?'Correct':'Completed with help'} className={results[i]===undefined?(i===round?'current':''):results[i]?'won':'helped'}/>)}</div></>}
+    {!intro&&!free&&<div className="score-tracker" aria-label={`Score ${score} of 5`}>
+      <span>Score {score} / 5</span><div className="score-dots">{rounds.map((_,i)=><i key={i} aria-label={results[i]===undefined?'Round '+(i+1):results[i]?'Correct':'Completed with help'} className={results[i]===undefined?(i===round?'current':''):results[i]?'won':'helped'}/>)}</div>
     </div>}
     {!intro&&!over&&!(complete&&!free)&&<div className="build-prompt" aria-live="polite">
       <span>{free?'Let’s get stuffed!':`Combination ${round+1} of 5 · build the`}</span>
       <FittedName>{free?(nest.count?freeName:'Pick an animal'):word}</FittedName>
       <p>{flight?flight+' is hopping in…':hint|| (free?'Pick anyone. Keep nesting.':stack.length?stack.join(' + ')+' · Who goes next?':'Choose three animals, starting with Turkey.')}</p>
     </div>}
-    {!intro&&<label className="explode-control">Explode
+    {!intro&&visibleStack.length>0&&<label ref={explodeAnchor} className="explode-control">
       <input aria-label="Explode animal nest" type="range" min="0" max="100" value={Math.round(explode*100)}
         disabled={!!flight||closing||visibleStack.length<2} onChange={e=>setExplode(Number(e.target.value)/100)}/>
     </label>}
@@ -377,7 +406,6 @@ export default function RingGame(){
           <button className="secondary" disabled={!!leaving} onClick={()=>chooseMode(true)}>Free Play</button>
         </div>
         <p className="intro-history">Inspired by engastration, the real tradition of nesting one animal inside another. <a href="https://en.wikipedia.org/wiki/Engastration" target="_blank" rel="noreferrer">Read its history ↗</a></p>
-        <small>Drag to orbit · scroll or pinch to peek closer</small>
       </div>
     </div>}
     {!loaded&&<Loader/>}

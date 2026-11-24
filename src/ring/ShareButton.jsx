@@ -1,7 +1,7 @@
 import React,{useState} from 'react';
 
 const siteUrl='https://what-the-stuff.com/';
-export default function ShareButton({text='Let’s get stuffing! Play What the STUFF!?',className=''}){
+export default function ShareButton({text='Let’s get stuffing! Play What the STUFF!?',className='',url=siteUrl}){
   const [message,setMessage]=useState('');
   const [manual,setManual]=useState(false);
   const [sharing,setSharing]=useState(false);
@@ -10,12 +10,12 @@ export default function ShareButton({text='Let’s get stuffing! Play What the S
     try{
       if(navigator.share){
         try{
-          await navigator.share({title:'What the STUFF!?',text,url:siteUrl});
+          await navigator.share({title:'What the STUFF!?',text,url});
           return;
         }catch(error){if(error.name==='AbortError')return;}
       }
       try{
-        await navigator.clipboard.writeText(`${text}\n${siteUrl}`);
+        await navigator.clipboard.writeText(`${text}\n${url}`);
         setMessage('Copied!');
       }catch{
         setManual(true);setMessage('Copy this to share:');
@@ -28,6 +28,6 @@ export default function ShareButton({text='Let’s get stuffing! Play What the S
       Share
     </button>
     <span role="status">{message}</span>
-    {manual&&<textarea aria-label="Text to share" readOnly value={`${text}\n${siteUrl}`} onFocus={event=>event.target.select()}/>}
+    {manual&&<textarea aria-label="Text to share" readOnly value={`${text}\n${url}`} onFocus={event=>event.target.select()}/>}
   </div>;
 }
