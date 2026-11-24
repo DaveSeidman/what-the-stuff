@@ -2,6 +2,7 @@ import {
   BufferGeometry, Color, Euler, Float32BufferAttribute, Matrix4,
   Quaternion, SphereGeometry, Vector3, BoxGeometry, CylinderGeometry,
 } from 'three';
+import { Brush, Evaluator, ADDITION } from 'three-bvh-csg';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 export const palette = {
@@ -33,7 +34,7 @@ function loft(stations, axis) {
   g.setIndex(index); g.computeVertexNormals(); return g;
 }
 
-export function model(draw) {
+export function model(draw, union=false) {
   const parts=[];
   function add(geometry,color,at=[0,0,0],scale=[1,1,1],rotation=[0,0,0],paint=0) {
     const g=geometry;
@@ -58,5 +59,23 @@ export function model(draw) {
   const cone=(at,top,bottom,height,color,sides=24,rotation)=>add(new CylinderGeometry(top,bottom,height,sides),color,at,[1,1,1],rotation);
   const tube=(stations,color,axis='y')=>add(loft(stations,axis),color);
   draw({egg,box,cone,tube,add});
+  if(union){
+    const evaluator=new Evaluator();
+    evaluator.attributes=['position','normal','ink','localPoint','paintType'];
+    evaluator.useGroups=false;
+    let result=new Brush(parts[0]);
+    result.updateMatrixWorld();
+    for(const geometry of parts.slice(1)){
+      const next=new Brush(geometry);
+      next.updateMatrixWorld();
+      const previous=result;
+      result=evaluator.evaluate(previous,next,ADDITION);
+      result.updateMatrixWorld();
+      if(!parts.includes(previous.geometry))previous.geometry.dispose();
+    }
+    const geometry=result.geometry;
+    parts.forEach(part=>{if(part!==geometry)part.dispose();});
+    return geometry;
+  }
   const merged=mergeGeometries(parts); parts.forEach(g=>g.dispose());return merged;
 }

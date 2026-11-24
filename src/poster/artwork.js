@@ -18,13 +18,16 @@ function fieldStrip(left,right,near,far,row=false) {
   const g=new BufferGeometry();g.setAttribute('position',new Float32BufferAttribute(p,3));g.setIndex(idx);g.computeVertexNormals();return g;
 }
 
-export function landscape({egg,box,cone,add},{ring=false}={}) {
-  const sky = new SphereGeometry(1050,48,32);
+export function landscape({egg,box,cone,add},{ring=false,propHeight=hillHeight}={}) {
+  if(!ring){
+  const sky = new SphereGeometry(ring?7000:1050,48,32);
   // The camera sees the printed inner surface of the sky dome.
   const indices = sky.index.array;
   for(let i=0;i<indices.length;i+=3) [indices[i],indices[i+1]]=[indices[i+1],indices[i]];
   add(sky,'sky',[0,0,0],[1,1,1],[0,0,0],5);
-  const sun=ring ? [83,-73,-132,17] : [74,118,-285,54];
+  }
+  if(!ring){
+  const sun=ring ? [250,-200,-740,38] : [74,118,-285,54];
   const [sx,sy,sz,radius]=sun;
   egg([sx,sy,sz],[radius,radius,radius],'sun',undefined,3);
   for(let i=0;i<10;i++){
@@ -36,6 +39,8 @@ export function landscape({egg,box,cone,add},{ring=false}={}) {
     egg([x-9*s,y+5*s,z],[17*s,8*s,10*s],'cream',undefined,4);
     egg([x+7*s,y+6*s,z],[15*s,11*s,9*s],'cream',undefined,4);
   }
+  }
+  if(!ring){
   egg([-230,ring?-231:-189,ring?-208:-355],[360,79,101],'mist');
   egg([212,ring?-237:-181,ring?-212:-300],[223,74,98],'tide');
   egg([-131,ring?-223:-183,ring?-209:-270],[210,49,68],'green');
@@ -43,8 +48,9 @@ export function landscape({egg,box,cone,add},{ring=false}={}) {
   for(let i=-14;i<15;i++){
     add(fieldStrip(i*53,i*53+22,430,-200,true),['pine','gold','cream','orange'][((i%4)+4)%4]);
   }
+  }
   function tree(x,z,s,c){
-    const y=hillHeight(x,z);
+    const y=propHeight(x,z);
     cone([x,y+10*s,z],1.2*s,2.2*s,22*s,'dark');
     egg([x,y+23*s,z],[8*s,14*s,7*s],c,[0,0,-5]);
     egg([x-5*s,y+17*s,z+1],[6*s,8*s,5*s],c,[0,0,19]);
@@ -52,7 +58,7 @@ export function landscape({egg,box,cone,add},{ring=false}={}) {
   for(let i=0;i<15;i++) tree(-86+i*12,-206+Math.sin(i)*12,.36+(i%4)*.12,'pine');
   tree(-143,-81,1.05,'orange');tree(-164,-89,1.4,'red');tree(-187,-92,.94,'gold');
   tree(173,-156,.8,'green');tree(183,-160,.65,'pine');
-  const x=123,z=-154,y=hillHeight(x,z);
+  const x=123,z=-154,y=propHeight(x,z);
   box([x,y+8,z],[25,16,17],'red'); box([x-5,y+4,z+9],[6,8,1],'cream');
   box([x+7,y+9,z+9],[4,4,1],'plum');
   box([x-6.5,y+19,z],[16,2,21],'wine',[0,0,30]);

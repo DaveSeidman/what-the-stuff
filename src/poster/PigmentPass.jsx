@@ -1,12 +1,12 @@
 import { useEffect, useLayoutEffect, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { DepthTexture, ShaderMaterial, Vector2, WebGLRenderTarget } from 'three';
+import { DepthTexture, ShaderMaterial, Vector2, Vector3, WebGLRenderTarget } from 'three';
 import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 
 const fragmentShader = `
   uniform sampler2D painting, sceneDepth;
   uniform vec2 pixel;
-  uniform float reach, density;
+  uniform float reach, density, focusDepth, depthScale, dof;
   uniform int finish;
   varying vec2 uvPaper;
   float hash(vec2 p) {
@@ -20,8 +20,26 @@ const fragmentShader = `
     return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),
                mix(hash(i+vec2(0,1)),hash(i+1.),f.x),f.y);
   }
+  vec3 samplePaint(vec2 uv){
+    vec3 paint=texture2D(painting,uv).rgb;
+    if(dof<.5)return paint;
+    float depth=texture2D(sceneDepth,uv).r;
+    float blur=7.*smoothstep(.035,.16,abs(depth-focusDepth)*depthScale);
+    if(blur<.1)return paint;
+    float weight=1.;
+    for(int i=0;i<6;i++){
+      float angle=float(i)*1.0472;
+      vec2 tap=uv+vec2(cos(angle),sin(angle))*pixel*blur;
+      float neighbor=texture2D(sceneDepth,tap).r;
+      // Background samples cannot wash over an in-focus silhouette.
+      float w=1.-smoothstep(.008,.025,abs(neighbor-depth)*depthScale);
+      paint+=texture2D(painting,tap).rgb*w;
+      weight+=w;
+    }
+    return paint/weight;
+  }
   void main() {
-    vec3 base=texture2D(painting,uvPaper).rgb;
+    vec3 base=samplePaint(uvPaper);
     float depth=texture2D(sceneDepth,uvPaper).r;
     vec2 sheet=gl_FragCoord.xy/density;
     float tooth=paper(sheet*.9);
@@ -37,7 +55,7 @@ const fragmentShader = `
       float ring=.28+.72*fract(float(i)*.618+.18);
       if(finish==3) direction=vec2(direction.x*1.5+.55,direction.y*.43);
       vec2 sampleUV=uvPaper+direction*radius*ring*pixel;
-      vec3 donor=texture2D(painting,sampleUV).rgb;
+      vec3 donor=samplePaint(sampleUV);
       float dz=depth-texture2D(sceneDepth,sampleUV).r;
       float darker=dot(base-donor,vec3(.24,.60,.16));
       float boundary=smoothstep(.055,.22,length(base-donor));
@@ -56,7 +74,7 @@ const fragmentShader = `
   }
 `;
 
-export default function PigmentPass({finish, spill}) {
+export default function PigmentPass({finish, spill, dof=false}) {
   const invalidate=useThree(state=>state.invalidate);
   const pass=useMemo(()=>{
     const target=new WebGLRenderTarget(1,1);
@@ -65,14 +83,14 @@ export default function PigmentPass({finish, spill}) {
       depthTest:false, depthWrite:false,
       uniforms:{
         painting:{value:target.texture}, sceneDepth:{value:target.depthTexture},
-        pixel:{value:new Vector2()}, density:{value:1}, reach:{value:4}, finish:{value:1}
+        pixel:{value:new Vector2()}, density:{value:1}, dof:{value:0}, depthScale:{value:1}, focusDepth:{value:.3}, reach:{value:4}, finish:{value:1}
       },
       vertexShader:'varying vec2 uvPaper; void main(){ uvPaper=uv; gl_Position=vec4(position.xy,0.,1.); }',
       fragmentShader
     });
-    return {target,material,quad:new FullScreenQuad(material),size:new Vector2()};
+    return {target,material,quad:new FullScreenQuad(material),size:new Vector2(), focus:new Vector3()};
   },[]);
-  useLayoutEffect(()=>{invalidate();},[finish,spill,invalidate]);
+  useLayoutEffect(()=>{invalidate();},[finish,spill,dof,invalidate]);
   useEffect(()=>()=>{pass.target.dispose();pass.material.dispose();pass.quad.dispose();},[pass]);
   useFrame(({gl,scene,camera})=>{
     if (!finish || !spill) {gl.render(scene,camera);return;}
@@ -83,6 +101,10 @@ export default function PigmentPass({finish, spill}) {
     uniforms.density.value=gl.getPixelRatio();
     uniforms.reach.value=spill;
     uniforms.finish.value=finish;
+    uniforms.dof.value=dof?1:0;
+    uniforms.depthScale.value=(camera.far-camera.near)/2100;
+    pass.focus.set(0,-121,0).project(camera);
+    uniforms.focusDepth.value=pass.focus.z*.5+.5;
     gl.setRenderTarget(pass.target);
     gl.render(scene,camera);
     gl.setRenderTarget(null);
