@@ -47,7 +47,7 @@ function openingEase(progress){
   const t=(low+high)/2;
   return 3*(1-t)*t*t+t*t*t;
 }
-function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,explodeAnchor,hover,hoverLabel}){
+function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,explodeAnchor,hover,hoverLabel,wrongPick}){
   const {camera,size,gl}=useThree();
   const hoverPoint=useMemo(()=>new Vector3(),[]);
   const anchorPoint=useMemo(()=>new Vector3(),[]),cameraRight=useMemo(()=>new Vector3(),[]);
@@ -66,6 +66,11 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
   const sunTarget=useMemo(()=>new Object3D(),[]);
   const ink=useMemo(printMaterial,[]);
   const dancers=useRef([]),surprise=useRef();
+  const heads=useRef([]),wrongReactions=useRef(new Map());
+  const reducedMotion=useMemo(()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches,[]);
+  useLayoutEffect(()=>{
+    if(wrongPick&&!reducedMotion)wrongReactions.current.set(animals.indexOf(wrongPick.name),0);
+  },[wrongPick,reducedMotion]);
   const flyer=useRef(),elapsed=useRef(0),landed=useRef(false);
   useLayoutEffect(()=>{
     camera.up.set(0,1,0);
@@ -133,6 +138,25 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       dancer.rotation.z=.055*Math.sin(phase);
       const squash=1-.035*Math.cos(phase*2);
       dancer.scale.set(1/Math.sqrt(squash),squash,1/Math.sqrt(squash));
+      const head=heads.current[i];
+      if(head){head.rotation.y=0;head.position.x=0;head.position.z=0;}
+      if(wrongReactions.current.has(i)){
+        const time=wrongReactions.current.get(i)+Math.min(delta,.06);
+        if(time>=.85)wrongReactions.current.delete(i);
+        else{
+          wrongReactions.current.set(i,time);
+          // A quick hop, followed by two diminishing "no" turns of the upper half.
+          const jump=time<.48?Math.sin(Math.PI*time/.48)*10:0;
+          dancer.position.y=ring[i].y+hop+jump;
+          const shake=.42*Math.sin(time/.85*Math.PI*4)*Math.sin(time/.85*Math.PI);
+          if(head){
+            head.rotation.y=shake;
+            const pivot=shells[i].x;
+            head.position.x=pivot*(1-Math.cos(shake));
+            head.position.z=pivot*Math.sin(shake);
+          }
+        }
+      }
     });
     const label=hoverLabel.current;
     if(label){
@@ -242,7 +266,7 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       const p=ring[i];if(name===flight || stack.includes(name))return null;
       return <group name={"animal-"+name} key={name} ref={el=>{dancers.current[i]=el;}} position={[p.x,p.y,p.z]} rotation={[0,p.yaw,0]}
         onClick={e=>{e.stopPropagation();if(e.delta<=5)onPick(name);}} onPointerOver={e=>{e.stopPropagation();onHover(name);}} onPointerOut={()=>onHover('')}>
-        <Doll name={name} geometry={models[i]} shell={shells[i]}/>
+        <Doll name={name} geometry={models[i]} shell={shells[i]} lidRef={el=>{heads.current[i]=el;}}/>
         <mesh position={[0,11,0]}><boxGeometry args={[32,27,21]}/><meshBasicMaterial visible={false}/></mesh>
       </group>;
     })}
@@ -290,6 +314,7 @@ function RingGame({initial}){
   const explodeAnchor=useRef(null),hoverLabel=useRef(null);
   const [completionSeconds,setCompletionSeconds]=useState(initial.over?initial.elapsed:null);
   const [leaving,setLeaving]=useState('');
+  const [wrongPick,setWrongPick]=useState(null);
   const modalAction=useRef();
   useEffect(()=>{
     if(!leaving)return;
@@ -340,7 +365,7 @@ function RingGame({initial}){
   function pick(name){
     if(intro||busy.current||(!free&&(complete||over))||(free?nest.recent:stack).includes(name))return;
     setHover('');
-    if(!free&&name!==order[stack.length]){setMissed(true);setHint('Try the '+order[stack.length].toLowerCase()+' next.');return;}
+    if(!free&&name!==order[stack.length]){setWrongPick({name});setMissed(true);setHint('Try the '+order[stack.length].toLowerCase()+' next.');return;}
     busy.current=true;if(!free)setHint('');setFlight(name);
   }
   function land(name){
@@ -378,7 +403,7 @@ function RingGame({initial}){
   return <main className="ring-game">
     <section className="pasture" aria-label={free?'Free nesting animal ring':'Animal ring. Build '+word}>
       <Canvas shadows={{type:PCFShadowMap}} flat dpr={[1,1.4]} camera={{fov:50,near:1,far:9000}}>
-        <Suspense fallback={null}><World hover={hover} hoverLabel={hoverLabel} explodeAnchor={explodeAnchor} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
+        <Suspense fallback={null}><World wrongPick={wrongPick} hover={hover} hoverLabel={hoverLabel} explodeAnchor={explodeAnchor} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
       </Canvas>
     </section>
     <ShareButton className="site-share" url={intro?undefined:shareUrl(currentRoute)} text={free&&nest.count>0?`Check out the ${freeName} I made at What-the-stuff.com!`:undefined}/>
