@@ -132,17 +132,6 @@
     ]
   },
   {
-    "id": 13,
-    "clue": "Turktopus",
-    "description": "A turkey stuffed with bacon stuffed with an octopus, smoky and shockingly sublime! 🧑‍🍳",
-    "correctAnswer": "turktopus.png",
-    "wrongAnswers": [
-      "turkguana.png",
-      "turkoise.png",
-      "turducken.png"
-    ]
-  },
-  {
     "id": 14,
     "clue": "Turkgator",
     "description": "A turkey stuffed with an alligator, succulent with a great bite at the finish! 🧑‍🍳",
