@@ -11,6 +11,7 @@ import PigmentPass from '../poster/PigmentPass';
 import {Doll,shellFor,nestingPlaces,explodedOffsets} from './Doll';
 import Loader from './Loader';
 import ShareButton from './ShareButton';
+import FittedName from './FittedName';
 const watercolorSettings={enabled:true,spill:12,strength:.69,pooling:.36,paperScale:1.75,wetness:.80,depthProtection:.85};
 import './ring.css';
 
@@ -344,7 +345,7 @@ export default function RingGame(){
     </div>}
     {!intro&&!over&&!(complete&&!free)&&<div className="build-prompt" aria-live="polite">
       <span>{free?'Let’s get stuffed!':`Combination ${round+1} of 5 · build the`}</span>
-      <h1>{free?(nest.count?freeName:'Pick an animal'):word}</h1>
+      <FittedName>{free?(nest.count?freeName:'Pick an animal'):word}</FittedName>
       <p>{flight?flight+' is hopping in…':hint|| (free?'Pick anyone. Keep nesting.':stack.length?stack.join(' + ')+' · Who goes next?':'Choose three animals, starting with Turkey.')}</p>
     </div>}
     {!intro&&<label className="explode-control">Explode
