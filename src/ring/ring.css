@@ -89,3 +89,11 @@ body:has(.ring-game){margin:0;background:#f6ebce;color:#293f38;font-family:Georg
 .intro-actions button{border-radius:30px}
 .creator-link{position:absolute;z-index:31;left:max(16px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));color:#49382c;font:.75rem system-ui,sans-serif;text-underline-offset:3px;background:#fff3d9d9;padding:6px 9px;border-radius:8px}
 .creator-link:focus-visible{outline:3px solid #376954;outline-offset:3px}
+
+.share-control{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:.75rem system-ui,sans-serif}
+.site-share{position:absolute;z-index:31;right:72px;top:max(16px,env(safe-area-inset-top));justify-content:flex-end;max-width:240px}
+.ring-game .share-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #8a714d55;border-radius:8px;padding:10px 14px;background:#fff2d8;color:#49382c}
+.ring-game .share-button:hover:enabled{background:#fff9e9}
+.share-control textarea{width:100%;min-height:90px;font:inherit;padding:8px;color:#49382c;background:#fff9e9;border:1px solid #8a714d55;border-radius:8px;user-select:text}
+.victory-share{justify-content:center;margin:12px auto 18px;max-width:300px}
+@media(max-width:650px){.site-share{right:62px;top:max(12px,env(safe-area-inset-top));max-width:180px}.site-share .share-button{min-height:40px;padding:8px 10px}}

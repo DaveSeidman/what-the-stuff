@@ -10,6 +10,7 @@ import {printMaterial} from '../poster/printMaterial';
 import PigmentPass from '../poster/PigmentPass';
 import {Doll,shellFor,nestingPlaces,explodedOffsets} from './Doll';
 import Loader from './Loader';
+import ShareButton from './ShareButton';
 const watercolorSettings={enabled:true,spill:12,strength:.69,pooling:.36,paperScale:1.75,wetness:.80,depthProtection:.85};
 import './ring.css';
 
@@ -246,6 +247,8 @@ export default function RingGame(){
   const [missed,setMissed]=useState(false),[score,setScore]=useState(0),[over,setOver]=useState(false);
   const watercolor=watercolorSettings;
   const [intro,setIntro]=useState(true);
+  const gameStarted=useRef(null);
+  const [completionSeconds,setCompletionSeconds]=useState(null);
   const [leaving,setLeaving]=useState('');
   const modalAction=useRef();
   useEffect(()=>{
@@ -266,6 +269,7 @@ export default function RingGame(){
       if(free!==nextFree){
         setExplode(0);setFlight(null);busy.current=false;
       }
+      if(!nextFree&&(free||gameStarted.current===null)){gameStarted.current=performance.now();setCompletionSeconds(null);}
       setFree(nextFree);setIntro(false);
     });
   }
@@ -311,6 +315,7 @@ export default function RingGame(){
     }
     setStack([...stack,name]);
     if(stack.length+1===order.length){
+      if(round===rounds.length-1)setCompletionSeconds((performance.now()-gameStarted.current)/1000);
       setResults(old=>[...old,!missed]);
       if(!missed)setScore(s=>s+1);
     }
@@ -319,7 +324,7 @@ export default function RingGame(){
     if(round===rounds.length-1){setOver(true);return;}
     setRound(r=>r+1);setStack([]);setHint('');setMissed(false);setHover('');
   }
-  function restart(){setRounds(makeRounds());setResults([]);setRound(0);setScore(0);setStack([]);setMissed(false);setHint('');setOver(false);}
+  function restart(){gameStarted.current=performance.now();setCompletionSeconds(null);setRounds(makeRounds());setResults([]);setRound(0);setScore(0);setStack([]);setMissed(false);setHint('');setOver(false);}
   // Frame the innermost receiver for each new hop so deep nests stay playable.
   const visibleStack=free?nest.recent:stack;
   const freeName=combinationName(nest.recent);
@@ -331,6 +336,7 @@ export default function RingGame(){
         <Suspense fallback={null}><World watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
       </Canvas>
     </section>
+    <ShareButton className="site-share"/>
     <div className="game-brand">What the STUFF!?</div>
     <button className="help-button" aria-label="Help" disabled={!!flight||closing} onClick={()=>setIntro(true)}>?</button>
     {!intro&&<div className="score-tracker" aria-label={free?nestLabel:`Score ${score} of 5`}>
@@ -356,6 +362,7 @@ export default function RingGame(){
         <h2 id="celebration-title">{over?'What a feast!':word}</h2>
         <p>{over?`You made all five combinations. ${score} on the first try!`:stack.join(' + ')}</p>
         <strong>Score {score} / 5</strong>
+        {over&&completionSeconds!==null&&<ShareButton className="victory-share" text={`I stuffed myself in ${Math.max(.1,completionSeconds/60).toFixed(1)} minutes at What-the-stuff.com! I scored ${score}/5. Can you beat me?`}/>}
         <button autoFocus disabled={closing} onClick={()=>leaveModal('celebration',over?restart:next)}>{over?'Play again':round===4?'See my score':'Next combination'} →</button>
       </div>
     </div>}
