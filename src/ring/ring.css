@@ -1,29 +1,87 @@
-body:has(.ring-game){margin:0;background:#f6ebce;color:#293f38;font-family:Georgia,serif}
-.ring-game{min-height:100svh;display:flex;flex-direction:column}
-.ring-game header,.play-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px clamp(14px,4vw,60px)}
-.ring-game h1,.ring-game h2,.ring-game p{margin:0}.ring-game h1{font-size:clamp(1.4rem,3vw,2.5rem);letter-spacing:-.06em;color:#833e2e}
-.ring-game header span,.ring-game summary,.ring-game button{font:600 .9rem system-ui,sans-serif}
-.pasture{position:relative;height:clamp(280px,72svh,880px);flex:1 0 auto;overflow:hidden;background:#278e94}
-.pasture>div:first-child{position:absolute!important;inset:0}
-.animal-name{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:#fff1cf;padding:5px 14px;border-radius:20px;pointer-events:none}
-.play-bar{min-height:68px;flex-wrap:wrap}.play-bar h2{font-size:1.55rem;color:#853626}.play-bar p{margin-top:4px}
-.play-bar button,.play-bar summary{cursor:pointer;color:#293f38;border:1px solid #a79e80;border-radius:6px;background:#fff5d9;padding:10px 14px}
-.play-bar details[open]{width:100%}.play-bar details div{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
-@media(max-width:550px){
-  .ring-game{min-height:100svh}
-  .pasture{height:auto;min-height:70svh;flex:1 0 70svh}
-  .play-bar{align-content:start;align-items:start;padding:10px 12px;gap:8px}
-  .play-bar h2{font-size:1.2rem}
-  .play-bar p{font-size:.9rem}
-  .ring-game header{flex-wrap:wrap;padding:8px 12px;gap:4px 10px}
-  .ring-game h1{font-size:1.2rem}
-  .mode-toggle{font-size:.75rem}
-}
-.hill-word{pointer-events:none;position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);color:#4b3824;background:#ffedbfed;padding:.12em .55em .18em;border-radius:.25em;font:italic bold clamp(.94rem,2.2vw,1.65rem) Georgia,serif;box-shadow:0 2px 0 #746c3c55;}
-.mode-toggle{display:inline-flex;align-items:center;gap:.45rem;margin-left:auto;font:600 .9rem system-ui,sans-serif;min-height:36px;cursor:pointer}
-.mode-toggle input{accent-color:#576c38;width:1.1rem;height:1.1rem}
-.explode-control{position:absolute;right:10px;top:22%;display:flex;align-items:center;gap:8px;flex-direction:column;padding:10px 6px;background:#fff0c9e8;border-radius:14px;font:600 .75rem system-ui,sans-serif}
+@font-face{font-family:'Agrave Pro';src:url('/fonts/agrave-pro.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
+body:has(.ring-game){margin:0;background:#f6ebce;color:#293f38;font-family:Georgia,serif;overflow:hidden}
+.ring-game,.ring-game *{box-sizing:border-box}
+.ring-game{position:relative;height:100svh;min-height:400px;isolation:isolate}
+.ring-game h1,.ring-game h2,.ring-game p{margin:0}
+.pasture{position:absolute;inset:0;overflow:hidden;background:#9bac81}
+.pasture>div{position:absolute!important;inset:0}
+.game-brand{position:absolute;top:max(20px,env(safe-area-inset-top));left:24px;font:400 clamp(1.3rem,2.5vw,2rem)/1 'Agrave Pro',Georgia,serif;color:#783c29;text-shadow:0 1px #fff0c9}
+.ring-game button{font:600 .85rem system-ui,sans-serif;min-height:44px;border:1px solid #8a714d55;background:#fff2d8;color:#49382c;border-radius:8px;padding:10px 17px;cursor:pointer}
+.ring-game button:disabled{opacity:.4;cursor:default}
+.ring-game button:hover:enabled{background:#fff9e9}
+.ring-game button:focus-visible,.ring-game summary:focus-visible,.ring-game input:focus-visible{outline:3px solid #376954;outline-offset:3px}
+.score-tracker{position:absolute;top:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;background:#fff1d7db;border-radius:30px;padding:8px 15px;font:600 .82rem system-ui,sans-serif;white-space:nowrap}
+.score-dots{display:flex;gap:6px}
+.score-dots i{width:9px;height:9px;border-radius:50%;border:1px solid #537044}
+.score-dots .current{background:#edb048}.score-dots .won{background:#54724a}.score-dots .helped{background:#b9784a}
+.build-prompt{position:absolute;top:90px;left:50%;transform:translateX(-50%);width:min(86%,760px);text-align:center;pointer-events:none;color:#5b3528;text-shadow:0 1px 6px #fff1d0}
+.build-prompt>span{font:600 .76rem system-ui,sans-serif;letter-spacing:.04em}
+.build-prompt h1{font:400 clamp(2.2rem,5.6vw,4.4rem)/1.05 'Agrave Pro',Georgia,serif;margin:5px 0;overflow-wrap:anywhere}
+.build-prompt p{font-size:1rem;line-height:1.4}
+.explode-control{position:absolute;right:16px;bottom:24px;display:flex;align-items:center;gap:8px;flex-direction:column;padding:12px 7px;background:#fff0c9d9;border-radius:18px;font:600 .72rem system-ui,sans-serif}
 .explode-control input{writing-mode:vertical-lr;direction:rtl;height:130px;width:24px;accent-color:#59733c;cursor:pointer}
-.hill-word{max-width:70%;overflow-wrap:anywhere;text-align:center}
-.play-bar>div{min-width:0;max-width:100%}
-.play-bar h2{overflow-wrap:anywhere}
+.animal-name{position:absolute;bottom:88px;left:50%;transform:translateX(-50%);background:#fff1cf;padding:6px 15px;border-radius:20px;pointer-events:none}
+.animal-picker{position:absolute;bottom:max(20px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:8px;justify-content:center;max-width:calc(100% - 28px)}
+.celebration-backdrop,.intro-stage,.loading-screen{position:absolute;inset:0;display:grid;place-items:center;z-index:10;padding:24px;background:#faf0d16b;backdrop-filter:blur(4px)}
+.celebration,.intro-card{text-align:center;width:min(710px,100%);position:relative;padding:clamp(24px,4vw,48px);background:#fff3d9f2;border:1px solid #9b764438;border-radius:30px;box-shadow:0 22px 80px #57422924}
+.celebration{animation:feast-pop .5s cubic-bezier(.18,.8,.27,1.2)}
+.celebration h2{font:400 clamp(2.5rem,7vw,5rem)/1.06 'Agrave Pro',Georgia,serif;color:#96472e;margin:12px 0;overflow-wrap:anywhere}
+.celebration p{font-size:clamp(1rem,2vw,1.25rem);line-height:1.5}
+.celebration strong{display:block;font:600 .9rem system-ui,sans-serif;margin:18px}
+.celebration button,.intro-actions button:first-child{background:#963f29;color:#fff3cf;border:0;padding:14px 24px;border-radius:30px}
+.celebration button:hover:enabled,.intro-actions button:first-child:hover:enabled{background:#783425}
+.celebration-leaves{position:absolute;inset:50%;pointer-events:none}
+.celebration-leaves i{position:absolute;width:12px;height:20px;border-radius:0 80% 0 80%;background:#d7842c;transform:rotate(var(--angle));animation:feast-leaf 1.3s var(--delay) ease-out both}
+.celebration-leaves i:nth-child(3n){background:#87904c}
+.celebration-leaves i:nth-child(3n + 1){background:#a84c31}
+.intro-card h1{font:400 clamp(3.2rem,9vw,6.3rem)/.9 'Agrave Pro',Georgia,serif;color:#97492e}
+.intro-card h2{font:400 clamp(1.2rem,3vw,1.65rem)/1.25 'Agrave Pro',Georgia,serif;margin:20px 0}
+.intro-card p{font-size:1rem;line-height:1.5;max-width:470px;margin:12px auto}
+.intro-turkey{font-size:2.5rem;display:block;margin-bottom:10px}
+.intro-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:25px 0 16px}
+.intro-card small{font:.75rem system-ui,sans-serif;color:#65694c}
+.loading-screen{position:fixed;z-index:30;justify-content:center;background:#f8edcf;display:flex;flex-direction:column;gap:16px;font:400 1.4rem 'Agrave Pro',Georgia,serif}
+.loading-turkey{font-size:3.6rem;animation:flock-bounce .8s ease-in-out infinite}
+.loading-track{width:160px;height:8px;background:#d6cfad;border-radius:10px;overflow:hidden}
+.loading-track span{height:100%;display:block;background:#a35434;transition:width .2s ease;border-radius:inherit}
+.gravy-effects{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden}
+.gravy-effects>div{position:absolute}
+.gravy-effects i{position:absolute;width:5px;height:9px;border-radius:60%;background:#97602d;box-shadow:inset 1px 1px #d99e50;animation:gravy-squirt .55s var(--delay) ease-out both}
+@keyframes flock-bounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+@keyframes feast-pop{from{opacity:0;transform:scale(.88) translateY(12px)}to{opacity:1;transform:none}}
+@keyframes feast-leaf{from{opacity:1;transform:rotate(var(--angle)) translateY(30px)}to{opacity:0;transform:rotate(var(--angle)) translateY(clamp(160px,30vw,330px)) rotate(110deg)}}
+@keyframes gravy-squirt{from{opacity:1;transform:translate(0,0) scale(.6)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.25)}}
+@media(max-width:650px){
+  .game-brand{top:max(16px,env(safe-area-inset-top));left:12px;font-size:1.25rem}
+  .score-tracker{top:60px;font-size:.75rem;padding:6px 12px}
+  .build-prompt{top:106px;width:88%}
+  .build-prompt h1{font-size:clamp(1.8rem,7.5vw,2.8rem)}
+  .build-prompt p{font-size:.85rem;max-width:90%;margin:auto}
+  .explode-control{right:8px;padding:9px 5px;bottom:18px}
+  .explode-control input{height:100px}
+  .intro-stage,.celebration-backdrop{padding:14px;overflow:auto}
+  .intro-card{padding:22px 18px}
+  .intro-card p{font-size:.9rem}
+  .intro-card h2{margin:15px 0}
+  .intro-actions{margin:18px 0 12px}
+}
+@media(max-height:600px){.intro-card{padding:14px}.intro-turkey{display:none}.intro-card h1{font-size:3rem}.intro-card h2{margin:10px}.intro-card p{font-size:.85rem;margin:8px auto}.intro-actions{margin:12px 0}}
+@media(prefers-reduced-motion:reduce){.ring-game *, .loading-screen *{animation:none!important;transition:none!important}}
+.help-button{position:absolute;right:20px;top:max(16px,env(safe-area-inset-top));border-radius:50%!important;width:40px;min-height:40px!important;padding:0!important;font:400 1.6rem 'Agrave Pro',Georgia,serif!important}
+.intro-history{font-size:.8rem!important;color:#64704f}
+.intro-history a{display:inline-block;color:#70402c;text-underline-offset:3px}
+.baster-cursor{position:fixed;top:0;left:0;width:22px;height:30px;will-change:transform;pointer-events:none}
+.gravy-effects>.baster-cursor{position:fixed}
+.gravy-effects .gravy-squirt{position:absolute}
+@media(hover:hover) and (pointer:fine){html,body,body *{cursor:none!important}}
+@media(hover:none),(pointer:coarse){.baster-cursor,.gravy-squirt{display:none!important}}
+.intro-stage,.celebration-backdrop{animation:modal-wash-in .35s ease both}
+.intro-card{animation:modal-bounce-in .55s cubic-bezier(.18,.8,.28,1.15) both}
+.modal-leaving{animation:modal-wash-out .28s ease both}
+.modal-leaving .intro-card,.modal-leaving .celebration{animation:modal-tuck-out .28s cubic-bezier(.55,0,.9,.45) both}
+@keyframes modal-wash-in{from{background:#faf0d100;backdrop-filter:blur(0)}to{background:#faf0d16b;backdrop-filter:blur(4px)}}
+@keyframes modal-wash-out{to{background:#faf0d100;backdrop-filter:blur(0)}}
+@keyframes modal-bounce-in{from{opacity:0;transform:translateY(30px) scale(.86) rotate(-2deg)}to{opacity:1;transform:none}}
+@keyframes modal-tuck-out{to{opacity:0;transform:translateY(18px) scale(.83) rotate(2deg)}}
+@media(max-width:650px){.help-button{right:12px;top:max(12px,env(safe-area-inset-top))}.intro-card{max-height:calc(100svh - 28px);overflow:auto}.intro-history{font-size:.73rem!important}}
+@media(prefers-reduced-motion:reduce){.intro-stage,.celebration-backdrop,.intro-card,.modal-leaving{animation:none!important}}

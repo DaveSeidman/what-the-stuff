@@ -11,25 +11,35 @@ export const recipes = [
 ];
 export const animals = [...new Set(recipes.flatMap(r=>r.slice(1)))];
 
-const nameParts = {
-  Turkey:'tur', Duck:'duck', Chicken:'cken', Tiger:'ger', Giraffe:'iraffe',
-  Lobster:'lobster', Crab:'crab', Iguana:'guana', Salmon:'salmon',
-  Ostrich:'strich', Tortoise:'toise', Octopus:'octopus', Zebra:'zebra',
-  Alligator:'gator', Kangaroo:'karoo', Llama:'llama', Penguin:'guin',
-  Crocodile:'croc', Chameleon:'ameleon'
+const firstParts={
+  Turkey:'tur',Duck:'duk',Chicken:'chik',Tiger:'tig',Giraffe:'gir',
+  Lobster:'lob',Crab:'cra',Iguana:'igu',Salmon:'sal',Ostrich:'ost',
+  Tortoise:'tor',Octopus:'oct',Zebra:'zeb',Alligator:'alli',
+  Kangaroo:'kang',Llama:'lla',Penguin:'peng',Crocodile:'croc',Chameleon:'cham'
 };
-
+const lastParts={
+  Turkey:'tur',Duck:'duk',Chicken:'ken',Tiger:'ger',Giraffe:'iraffe',
+  Lobster:'lob',Crab:'krab',Iguana:'guana',Salmon:'sal',Ostrich:'strich',
+  Tortoise:'toise',Octopus:'topus',Zebra:'ebra',Alligator:'gator',
+  Kangaroo:'karoo',Llama:'ama',Penguin:'guin',Crocodile:'croc',Chameleon:'ameleon'
+};
 export function combinationName(nest){
   if(!nest.length)return 'Pick an animal';
-  if(nest.length===1)return nest[0];
-  let name=nest[0].toLowerCase();
-  let start=1;
-  // Keep established recipe names as the beginning of a longer combination.
-  for(let length=nest.length;length>=2;length--){
-    const recipe=recipes.find(row=>row.length===length+1&&row.slice(1).every((animal,i)=>animal===nest[i]));
-    if(recipe){name=recipe[0].toLowerCase();start=length;break;}
+  let prefix=firstParts[nest[0]],start=1;
+  for(let count=nest.length;count>=2;count--){
+    const known=recipes.find(row=>row.length===count+1&&row.slice(1).every((animal,i)=>animal===nest[i]));
+    if(known&&!animals.some(animal=>known[0].toLowerCase().includes(animal.toLowerCase()))){
+      prefix=known[0].toLowerCase();start=count;break;
+    }
   }
-  if(start===1)name=nameParts[nest[0]];
-  name+=nest.slice(start).map(animal=>nameParts[animal]).join('');
+  let name=prefix+nest.slice(start).map(animal=>lastParts[animal]).join('');
+  // Joining innocent syllables can accidentally reveal a full animal name.
+  for(const animal of animals){
+    const full=animal.toLowerCase();
+    while(name.includes(full)){
+      const index=name.indexOf(full)+Math.floor(full.length/2);
+      name=name.slice(0,index)+name.slice(index+1);
+    }
+  }
   return name[0].toUpperCase()+name.slice(1);
 }

@@ -8,10 +8,11 @@ import {printMaterial} from '../poster/printMaterial';
 export const summit=-139;
 export function ground(x,z){
   const r=Math.hypot(x,z);
+  const t=Math.max(0,Math.min(1,(r-145)/100));
+  const blend=t*t*(3-2*t);
   const roll=14*Math.sin(x*.009+z*.004)*Math.cos(z*.009)+9*Math.sin(z*.014+x*.003);
-  const distance=Math.max(0,r-230);
-  const distantRidges=(48*Math.sin(x*.004+z*.002)+36*Math.cos(z*.005-x*.002))*(1-Math.exp(-distance/170));
-  return distantRidges-.24*distance*distance/(distance+80)+summit-36*(1-Math.exp(-Math.pow(r/175,2)))+roll*(1-Math.exp(-Math.pow(r/150,2)));
+  return summit+blend*(-25+roll);
+
 }
 function grassPatch(){
   const positions=[];
@@ -20,6 +21,12 @@ function grassPatch(){
   for(let i=0;i<3700;i++){
     const angle=random()*Math.PI*2, r=Math.sqrt(random())*(i<1400?155:420);
     const x=r*Math.cos(angle), z=r*Math.sin(angle), y=ground(x,z)+.22;
+    let bare=false;
+    for(let j=0;j<19;j++){
+      const a=j*2*Math.PI/19+.08;
+      if(Math.hypot(x-120*Math.cos(a),z-120*Math.sin(a))<13){bare=true;break;}
+    }
+    if(bare)continue;
     const bearing=random()*Math.PI*2, width=.18+random()*.55;
     const dx=Math.cos(bearing)*width,dz=Math.sin(bearing)*width;
     positions.push(x-dx,y,z-dz,x+dx,y,z+dz,x+random()*2.7-1,y+1.2+random()*3.9,z+random()*1.6-.8);
@@ -37,6 +44,18 @@ function meadow(tools){
   }
   const g=new BufferGeometry();g.setAttribute('position',new Float32BufferAttribute(vertices,3));
   g.setIndex(indices);g.computeVertexNormals();add(g,'#8ca65d');
+  for(let spot=0;spot<19;spot++){
+    const a=spot*2*Math.PI/19+.08,x=120*Math.cos(a),z=120*Math.sin(a);
+    const points=[x,ground(x,z)+.08,z],triangles=[];
+    for(let j=0;j<=40;j++){
+      const angle=j*Math.PI/20,r=12.3+.8*Math.sin(j*2.1+spot);
+      points.push(x+r*Math.cos(angle),ground(x,z)+.08,z+r*Math.sin(angle));
+      if(j)triangles.push(0,j+1,j);
+    }
+    const patch=new BufferGeometry();
+    patch.setAttribute('position',new Float32BufferAttribute(points,3));patch.setIndex(triangles);patch.computeVertexNormals();
+    add(patch,spot%2?'#ac9871':'#a28d68');
+  }
   for(const [x,z,s] of [[-143,-81,1.05],[-164,-89,1.4],[173,-156,.8]]){
     for(let i=0;i<7;i++) egg([x+Math.sin(i*3)*6*s,ground(x,z)+(20+i%4*3)*s,z+(4+i%3)*s],[2*s,2.1*s,2*s],'red');
   }

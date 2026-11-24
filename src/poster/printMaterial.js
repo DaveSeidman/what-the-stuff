@@ -1,4 +1,4 @@
-import { Color, ShaderMaterial, UniformsLib, UniformsUtils } from 'three';
+import { Color, Vector3, ShaderMaterial, UniformsLib, UniformsUtils } from 'three';
 import { palette } from './sculpture';
 
 export function printMaterial() {
@@ -6,6 +6,7 @@ export function printMaterial() {
     lights: true,
     uniforms: {
       ...UniformsUtils.clone(UniformsLib.lights),
+      bodyCenter:{value:new Vector3()},
       environment:{value:0}, surface:{value:0}, clockTime:{value:0},
       maroon:{value:new Color(palette.wine)}, butter:{value:new Color(palette.cream)},
       tangerine:{value:new Color(palette.orange)},
@@ -34,7 +35,7 @@ export function printMaterial() {
       #include <shadowmap_pars_fragment>
       #include <shadowmask_pars_fragment>
       uniform float surface, clockTime, environment;
-      uniform vec3 maroon, butter, tangerine;
+      uniform vec3 maroon, butter, tangerine, bodyCenter;
       varying vec3 vInk, vPoint, vLocal, vNormal, vWorld, vViewPosition;
       varying float vType;
       float hash(vec2 p) {
@@ -76,6 +77,12 @@ export function printMaterial() {
           ink=mix(ink,butter,smoothstep(.78,.80,band));
           ink=mix(ink,butter,(1.-smoothstep(.015,.035,abs(vLocal.x+.04*vLocal.y)))*.28);
         }
+        if(surface>6.5){
+          vec3 body=vPoint-bodyCenter;
+          float stripes=sin(body.x*.95+sin(body.y*.22)*.8+body.z*.15);
+          float whiteFur=smoothstep(.025,.20,min(ink.r,min(ink.g,ink.b)));
+          ink=mix(ink,mix(vec3(.021,.032,.029),ink,smoothstep(-.10,.12,stripes)),whiteFur*.93);
+        }
         float light=.5;
         #if NUM_DIR_LIGHTS > 0
           light=dot(n,directionalLights[0].direction)*directionalLights[0].color.r;
@@ -109,7 +116,7 @@ export function printMaterial() {
               vec3 dye=mix(a,b,smoothstep(.78,.97,fract(beat)));
               pigment=mix(pigment,pigment*dye*2.0,.78*(1.-feature));
             }
-          }else if(surface<4.5){
+          }else if(surface<4.5 || (surface>5.5 && surface<6.5)){
             vec3 lamp=normalize(vec3(-.4,.7,.6));
             #if NUM_DIR_LIGHTS > 0
               lamp=directionalLights[0].direction;

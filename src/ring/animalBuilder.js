@@ -99,6 +99,11 @@ function sculpt(name,{egg},features) {
     } else {
       const croc=name==='Crocodile';
       oval(-20,19,0,croc?7:5,3.4,croc?4:5.6);
+      if(['Alligator','Crocodile'].includes(name)){
+        for(const side of [-1,1])for(let i=0;i<3;i++){
+          oval(-23+i*3,17.8,side*(croc?3.5:5),.95,1.65,.9,'white',i%2?12:-12);
+        }
+      }
       oval(15,13,0,7,4,4,fur,12);
       for(let i=0;i<3;i++) oval(-3+i*5,33-i*.6,0,2.5,name==='Iguana'?4:2.2,2.3,'pine');
     }
@@ -114,7 +119,7 @@ function sculpt(name,{egg},features) {
   for(const side of [-1,1]){
     oval(-8,y+7,side*5,3.4,longEars?6.6:3.8,3.2);
     if(giraffe) oval(-12,y+9,side*3,2,3.2,2,'#986334');
-    if(['Tiger','Zebra','Giraffe'].includes(name)) for(let i=-1;i<=1;i++)
+    if(['Tiger','Giraffe'].includes(name)) for(let i=-1;i<=1;i++)
       oval(i*5,22+Math.abs(i),side*(15.3-Math.abs(i)*1.2),giraffe?3:1.6,giraffe?3:4.6,1.6,giraffe?'#a56632':'dark',-12);
   }
   oval(15,14,0,name==='Kangaroo'?8:5,4,4,fur,-12);
