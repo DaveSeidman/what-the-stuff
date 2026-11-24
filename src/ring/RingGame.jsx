@@ -353,7 +353,7 @@ export default function RingGame(){
     </label>}
     {hover&&!intro&&!flight&&<output className="animal-name">{hover}</output>}
     {!intro&&!over&&<div className="animal-picker">
-      {free&&nest.count>0&&<button disabled={!!flight||closing} onClick={()=>{setNest({count:0,recent:[]});setExplode(0);setHover('');}}>New nest</button>}
+      {free&&nest.count>0&&<button className="restart-nest" disabled={!!flight||closing} onClick={()=>{setNest({count:0,recent:[]});setExplode(0);setHover('');}}>Restart</button>}
     </div>}
     {!intro&&!free&&(complete||over)&&<div className={"celebration-backdrop "+(leaving==='celebration'?'modal-leaving':'')}>
       <div className="celebration" role="dialog" aria-modal="true" aria-labelledby="celebration-title">
