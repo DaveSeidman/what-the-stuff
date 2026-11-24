@@ -4,6 +4,7 @@ import {TOUCH,Object3D,PCFShadowMap,Vector3} from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {AnimalLoader} from './AnimalLoader';
 import {animals,combinationName} from './animals';
+import {makeRounds} from './rounds';
 import Countryside from './Countryside';
 import {Meadow,ground,summit} from './Meadow';
 import {printMaterial} from '../poster/printMaterial';
@@ -21,19 +22,6 @@ const ring=animals.map((_,i)=>{
   const x=120*Math.cos(angle),z=120*Math.sin(angle);
   return {x,z,y:ground(x,z),yaw:-angle};
 });
-function makeRounds(){
-  const choices=animals.filter(name=>name!=='Turkey');
-  const pool=[];
-  for(let i=0;i<choices.length;i++)for(let j=i+1;j<choices.length;j++){
-    const trio=['Turkey',choices[i],choices[j]];
-    pool.push([combinationName(trio),...trio]);
-  }
-  for(let i=pool.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [pool[i],pool[j]]=[pool[j],pool[i]];
-  }
-  return pool.slice(0,5);
-}
 // CSS cubic-bezier(.42, 0, .58, 1), evaluated against elapsed time.
 function openingEase(progress){
   const x=Math.max(0,Math.min(1,progress));
@@ -415,7 +403,7 @@ function RingGame({initial}){
     {!intro&&!over&&!(complete&&!free)&&<div className="build-prompt" aria-live="polite">
       <span>{free?'Let’s get stuffed!':`Combination ${round+1} of 5 · build the`}</span>
       <FittedName>{free?(nest.count?freeName:'Pick an animal'):word}</FittedName>
-      <p>{flight?flight+' is hopping in…':hint|| (free?'Pick anyone. Keep nesting.':stack.length?stack.join(' + ')+' · Who goes next?':'Choose three animals, starting with Turkey.')}</p>
+      <p>{flight?flight+' is hopping in…':hint|| (free?'Pick anyone. Keep nesting.':stack.length?stack.join(' + ')+' · Who goes next?':`Choose three animals, starting with ${order[0]}.`)}</p>
     </div>}
     {!intro&&visibleStack.length>0&&<label ref={explodeAnchor} className="explode-control">
       <input aria-label="Explode animal nest" type="range" min="0" max="100" value={Math.round(explode*100)}
