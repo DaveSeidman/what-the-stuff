@@ -400,7 +400,7 @@ function RingGame({initial}){
       <div className="intro-card" role="dialog" aria-modal="true" aria-labelledby="intro-title">
         <span className="intro-turkey" aria-hidden="true">🦃</span>
         <h1 id="intro-title">What the<br/>STUFF!?</h1>
-        <h2>Stuffing's the Best Part of Thanksgiving!</h2>
+        <h2><em>Stuffing's</em> the Best Part of Thanksgiving!</h2>
         <div className="intro-actions">
           <button autoFocus disabled={!!leaving} onClick={()=>chooseMode(false)}>Let’s get stuffing!</button>
           <button className="secondary" disabled={!!leaving} onClick={()=>chooseMode(true)}>Free Play</button>
