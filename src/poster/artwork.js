@@ -50,6 +50,7 @@ export function landscape({egg,box,cone,add},{ring=false,propHeight=hillHeight}=
   }
   }
   function tree(x,z,s,c){
+    if(ring && s>=.8){x*=1.35;z*=1.35;}
     const y=propHeight(x,z);
     cone([x,y+10*s,z],1.2*s,2.2*s,22*s,'dark');
     egg([x,y+23*s,z],[8*s,14*s,7*s],c,[0,0,-5]);
@@ -58,13 +59,19 @@ export function landscape({egg,box,cone,add},{ring=false,propHeight=hillHeight}=
   for(let i=0;i<15;i++) tree(-86+i*12,-206+Math.sin(i)*12,.36+(i%4)*.12,'pine');
   tree(-143,-81,1.05,'orange');tree(-164,-89,1.4,'red');tree(-187,-92,.94,'gold');
   tree(173,-156,.8,'green');tree(183,-160,.65,'pine');
-  const x=123,z=-154,y=propHeight(x,z);
-  box([x,y+8,z],[25,16,17],'red'); box([x-5,y+4,z+9],[6,8,1],'cream');
-  box([x+7,y+9,z+9],[4,4,1],'plum');
-  box([x-6.5,y+19,z],[16,2,21],'wine',[0,0,30]);
-  box([x+6.5,y+19,z],[16,2,21],'plum',[0,0,-30]);
-  cone([x+23,y+13,z-4],4,4.5,26,'red');
-  cone([x+23,y+29,z-4],.2,5.2,7,'dark');
+  const x=ring?492:123,z=ring?-616:-154,y=propHeight(x,z),size=ring?10:1;
+  const barnBox=(offset,dimensions,color,rotation)=>box(
+    [x+offset[0]*size,y+offset[1]*size,z+offset[2]*size],
+    dimensions.map(value=>value*size),color,rotation);
+  const barnCone=(offset,top,bottom,height,color)=>cone(
+    [x+offset[0]*size,y+offset[1]*size,z+offset[2]*size],
+    top*size,bottom*size,height*size,color);
+  barnBox([0,8,0],[25,16,17],'red'); barnBox([-5,4,9],[6,8,1],'cream');
+  barnBox([7,9,9],[4,4,1],'plum');
+  barnBox([-6.5,19,0],[16,2,21],'wine',[0,0,30]);
+  barnBox([6.5,19,0],[16,2,21],'plum',[0,0,-30]);
+  barnCone([23,13,-4],4,4.5,26,'red');
+  barnCone([23,29,-4],.2,5.2,7,'dark');
 }
 
 // Feet are modeled in pairs so the perches read from either side.

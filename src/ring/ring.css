@@ -85,13 +85,7 @@ body:has(.ring-game){margin:0;background:#f6ebce;color:#293f38;font-family:Georg
 @keyframes modal-tuck-out{to{opacity:0;transform:translateY(18px) scale(.83) rotate(2deg)}}
 @media(max-width:650px){.help-button{right:12px;top:max(12px,env(safe-area-inset-top))}.intro-card{max-height:calc(100svh - 28px);overflow:auto}.intro-history{font-size:.73rem!important}}
 @media(prefers-reduced-motion:reduce){.intro-stage,.celebration-backdrop,.intro-card,.modal-leaving{animation:none!important}}
-.watercolor-controls{position:fixed;z-index:60;top:70px;right:16px;width:280px;max-width:calc(100vw - 32px);max-height:calc(100svh - 90px);overflow:auto;padding:16px;background:#fff4dff5;border:1px solid #8e795b66;border-radius:14px;box-shadow:0 10px 36px #332a2144;font:.82rem system-ui,sans-serif;color:#3a4232}
-.watercolor-controls>div{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.watercolor-controls h2{font:400 1.7rem 'Agrave Pro',Georgia,serif}
-.watercolor-controls label{display:block;margin:13px 0}
-.watercolor-controls label span{display:flex;justify-content:space-between;gap:8px}
-.watercolor-controls label output{font-variant-numeric:tabular-nums;color:#8c4b2e}
-.watercolor-controls input[type=range]{display:block;width:100%;accent-color:#52714a;margin-top:8px}
-.watercolor-controls .watercolor-enabled{display:flex;align-items:center;gap:7px}
-.watercolor-controls button{padding:7px 12px;min-height:34px}
-.watercolor-controls small{display:block;margin-top:12px;color:#6a705e}
+
+.intro-actions button{border-radius:30px}
+.creator-link{position:absolute;z-index:31;left:max(16px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));color:#49382c;font:.75rem system-ui,sans-serif;text-underline-offset:3px;background:#fff3d9d9;padding:6px 9px;border-radius:8px}
+.creator-link:focus-visible{outline:3px solid #376954;outline-offset:3px}

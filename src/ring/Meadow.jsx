@@ -37,7 +37,7 @@ function meadow(tools){
   const {add,egg}=tools;
   const vertices=[],indices=[];
   for(let r=0;r<=80;r++) for(let j=0;j<=96;j++){
-    const radius=r<45?r*5.6:252+(r-45)*12;
+    const radius=r<45?r*5.6:252+(r-45)*25;
     const a=j*Math.PI/48,x=Math.cos(a)*radius,z=Math.sin(a)*radius;
     vertices.push(x,ground(x,z),z);
     if(r&&j){const i=r*97+j;indices.push(i,i-1,i-98,i,i-98,i-97);}
@@ -57,7 +57,7 @@ function meadow(tools){
     add(patch,spot%2?'#ac9871':'#a28d68');
   }
   for(const [x,z,s] of [[-143,-81,1.05],[-164,-89,1.4],[173,-156,.8]]){
-    for(let i=0;i<7;i++) egg([x+Math.sin(i*3)*6*s,ground(x,z)+(20+i%4*3)*s,z+(4+i%3)*s],[2*s,2.1*s,2*s],'red');
+    for(let i=0;i<7;i++) egg([x*1.35+Math.sin(i*3)*6*s,ground(x*1.35,z*1.35)+(20+i%4*3)*s,z*1.35+(4+i%3)*s],[2*s,2.1*s,2*s],'red');
   }
 }
 export function Meadow({material}){

@@ -10,7 +10,7 @@ import {printMaterial} from '../poster/printMaterial';
 import PigmentPass from '../poster/PigmentPass';
 import {Doll,shellFor,nestingPlaces,explodedOffsets} from './Doll';
 import Loader from './Loader';
-import WatercolorControls,{watercolorDefaults} from './WatercolorControls';
+const watercolorSettings={enabled:true,spill:12,strength:.69,pooling:.36,paperScale:1.75,wetness:.80,depthProtection:.85};
 import './ring.css';
 
 const ring=animals.map((_,i)=>{
@@ -244,7 +244,7 @@ export default function RingGame(){
   const [rounds,setRounds]=useState(makeRounds),[round,setRound]=useState(0),[stack,setStack]=useState([]);
   const [flight,setFlight]=useState(null),[hint,setHint]=useState(''),[hover,setHover]=useState('');
   const [missed,setMissed]=useState(false),[score,setScore]=useState(0),[over,setOver]=useState(false);
-  const [watercolor,setWatercolor]=useState(()=>({...watercolorDefaults}));
+  const watercolor=watercolorSettings;
   const [intro,setIntro]=useState(true);
   const [leaving,setLeaving]=useState('');
   const modalAction=useRef();
@@ -364,17 +364,15 @@ export default function RingGame(){
         <span className="intro-turkey" aria-hidden="true">🦃</span>
         <h1 id="intro-title">What the<br/>STUFF!?</h1>
         <h2>Stuffing's the Best Part of Thanksgiving!</h2>
-        <p>Meet the world’s most enthusiastic stuffed animals. Everyone wants to be the stuffing.</p>
-        <p>Pick a silly combination. Help three animals hop inside each other. Five rounds, one very full flock.</p>
         <div className="intro-actions">
           <button autoFocus disabled={!!leaving} onClick={()=>chooseMode(false)}>Let’s get stuffing!</button>
-          <button className="secondary" disabled={!!leaving} onClick={()=>chooseMode(true)}>Just let me play</button>
+          <button className="secondary" disabled={!!leaving} onClick={()=>chooseMode(true)}>Free Play</button>
         </div>
         <p className="intro-history">Inspired by engastration, the real tradition of nesting one animal inside another. <a href="https://en.wikipedia.org/wiki/Engastration" target="_blank" rel="noreferrer">Read its history ↗</a></p>
         <small>Drag to orbit · scroll or pinch to peek closer</small>
       </div>
     </div>}
     {!loaded&&<Loader/>}
-    <WatercolorControls settings={watercolor} onChange={setWatercolor}/>
+    <a className="creator-link" href="https://daveseidman.com" target="_blank" rel="noreferrer">daveseidman.com ↗</a>
   </main>;
 }
