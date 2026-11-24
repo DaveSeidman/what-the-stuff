@@ -47,8 +47,9 @@ function openingEase(progress){
   const t=(low+high)/2;
   return 3*(1-t)*t*t+t*t*t;
 }
-function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,explodeAnchor}){
+function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,explodeAnchor,hover,hoverLabel}){
   const {camera,size,gl}=useThree();
+  const hoverPoint=useMemo(()=>new Vector3(),[]);
   const anchorPoint=useMemo(()=>new Vector3(),[]),cameraRight=useMemo(()=>new Vector3(),[]);
   const controlsRef=useRef(null),fitZoom=useRef(null);
   const cameraGoal=useRef(null),wasExploded=useRef(false);
@@ -133,6 +134,20 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       const squash=1-.035*Math.cos(phase*2);
       dancer.scale.set(1/Math.sqrt(squash),squash,1/Math.sqrt(squash));
     });
+    const label=hoverLabel.current;
+    if(label){
+      const index=animals.indexOf(hover),animal=dancers.current[index];
+      if(animal&&animal.visible){
+        animal.updateWorldMatrix(true,false);
+        hoverPoint.set(0,shells[index].height+3,0);
+        animal.localToWorld(hoverPoint).project(camera);
+        const visible=hoverPoint.z>=-1&&hoverPoint.z<=1&&Math.abs(hoverPoint.x)<=1&&Math.abs(hoverPoint.y)<=1;
+        label.style.visibility=visible?'visible':'hidden';
+        const padding=label.offsetWidth/2+12;
+        label.style.left=`${Math.max(padding,Math.min(size.width-padding,(hoverPoint.x+1)*size.width/2))}px`;
+        label.style.top=`${(1-hoverPoint.y)*size.height/2}px`;
+      }else label.style.visibility='hidden';
+    }
     const nesting=stack.length>0;
     if(flight) elapsed.current+=Math.min(delta,.12);
     const reactionTime=elapsed.current;
@@ -272,7 +287,7 @@ function RingGame({initial}){
   const watercolor=watercolorSettings;
   const [intro,setIntro]=useState(initial.mode==='intro');
   const gameStarted=useRef(initial.mode==='quiz'?performance.now()-(initial.elapsed||0)*1000:null);
-  const explodeAnchor=useRef(null);
+  const explodeAnchor=useRef(null),hoverLabel=useRef(null);
   const [completionSeconds,setCompletionSeconds]=useState(initial.over?initial.elapsed:null);
   const [leaving,setLeaving]=useState('');
   const modalAction=useRef();
@@ -363,7 +378,7 @@ function RingGame({initial}){
   return <main className="ring-game">
     <section className="pasture" aria-label={free?'Free nesting animal ring':'Animal ring. Build '+word}>
       <Canvas shadows={{type:PCFShadowMap}} flat dpr={[1,1.4]} camera={{fov:50,near:1,far:9000}}>
-        <Suspense fallback={null}><World explodeAnchor={explodeAnchor} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
+        <Suspense fallback={null}><World hover={hover} hoverLabel={hoverLabel} explodeAnchor={explodeAnchor} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
       </Canvas>
     </section>
     <ShareButton className="site-share" url={intro?undefined:shareUrl(currentRoute)} text={free&&nest.count>0?`Check out the ${freeName} I made at What-the-stuff.com!`:undefined}/>
@@ -381,7 +396,7 @@ function RingGame({initial}){
       <input aria-label="Explode animal nest" type="range" min="0" max="100" value={Math.round(explode*100)}
         disabled={!!flight||closing||visibleStack.length<2} onChange={e=>setExplode(Number(e.target.value)/100)}/>
     </label>}
-    {hover&&!intro&&!flight&&<output className="animal-name">{hover}</output>}
+    {hover&&!intro&&!flight&&<output ref={hoverLabel} className="animal-name">{hover}</output>}
     {!intro&&!over&&<div className="animal-picker">
       {free&&nest.count>0&&<button className="restart-nest" disabled={!!flight||closing} onClick={()=>{setNest({count:0,recent:[]});setExplode(0);setHover('');}}>Restart</button>}
     </div>}

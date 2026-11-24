@@ -121,3 +121,5 @@ body:has(.ring-game){margin:0;background:#f6ebce;color:#293f38;font-family:Georg
 .explode-control input::-moz-range-track{width:5px;background:transparent;border:1px solid #fff;border-radius:999px}
 .explode-control input::-moz-range-thumb{width:14px;height:14px;border:1.5px solid #fff;border-radius:50%;background:#ffffff38}
 @media(max-width:650px){.explode-control{padding:0}}
+
+.animal-name{bottom:auto;top:0;left:0;transform:translate(-50%,calc(-100% - 8px));visibility:hidden;white-space:nowrap}
