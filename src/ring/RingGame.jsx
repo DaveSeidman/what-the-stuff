@@ -10,6 +10,7 @@ import {printMaterial} from '../poster/printMaterial';
 import PigmentPass from '../poster/PigmentPass';
 import {Doll,shellFor,nestingPlaces,explodedOffsets} from './Doll';
 import Loader from './Loader';
+import WatercolorControls,{watercolorDefaults} from './WatercolorControls';
 import './ring.css';
 
 const ring=animals.map((_,i)=>{
@@ -43,7 +44,7 @@ function openingEase(progress){
   const t=(low+high)/2;
   return 3*(1-t)*t*t+t*t*t;
 }
-function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady}){
+function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor}){
   const {camera,size,gl}=useThree();
   const controlsRef=useRef(null),fitZoom=useRef(null);
   const cameraGoal=useRef(null),wasExploded=useRef(false);
@@ -236,13 +237,14 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
           </group>;
         })}
       </group></group>}
-    <PigmentPass finish={1} spill={14}/>
+    <PigmentPass finish={1} spill={watercolor.spill} settings={watercolor}/>
   </>;
 }
 export default function RingGame(){
   const [rounds,setRounds]=useState(makeRounds),[round,setRound]=useState(0),[stack,setStack]=useState([]);
   const [flight,setFlight]=useState(null),[hint,setHint]=useState(''),[hover,setHover]=useState('');
   const [missed,setMissed]=useState(false),[score,setScore]=useState(0),[over,setOver]=useState(false);
+  const [watercolor,setWatercolor]=useState(()=>({...watercolorDefaults}));
   const [intro,setIntro]=useState(true);
   const [leaving,setLeaving]=useState('');
   const modalAction=useRef();
@@ -326,7 +328,7 @@ export default function RingGame(){
   return <main className="ring-game">
     <section className="pasture" aria-label={free?'Free nesting animal ring':'Animal ring. Build '+word}>
       <Canvas shadows={{type:PCFShadowMap}} flat dpr={[1,1.4]} camera={{fov:50,near:1,far:9000}}>
-        <Suspense fallback={null}><World closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
+        <Suspense fallback={null}><World watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
       </Canvas>
     </section>
     <div className="game-brand">What the STUFF!?</div>
@@ -373,5 +375,6 @@ export default function RingGame(){
       </div>
     </div>}
     {!loaded&&<Loader/>}
+    <WatercolorControls settings={watercolor} onChange={setWatercolor}/>
   </main>;
 }
