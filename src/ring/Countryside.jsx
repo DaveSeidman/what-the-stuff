@@ -1,11 +1,12 @@
 import React,{useMemo} from 'react';
 import {useFrame,useLoader} from '@react-three/fiber';
-import {SRGBColorSpace,TextureLoader,ShaderMaterial,Vector2} from 'three';
+import {SRGBColorSpace,TextureLoader,ShaderMaterial,Vector2,RepeatWrapping} from 'three';
 
 export default function Countryside(){
   const texture=useLoader(TextureLoader,'/environment/harvest-panorama.png');
   const material=useMemo(()=>{
     texture.colorSpace=SRGBColorSpace;
+    texture.wrapS=RepeatWrapping;
     texture.needsUpdate=true;
     return new ShaderMaterial({
       depthTest:false,depthWrite:false,
@@ -18,8 +19,8 @@ export default function Countryside(){
         varying vec2 screenUV;
         void main(){
           vec2 screen=(screenUV-.5)*vec2(aspect,1.);
-          vec3 ray=normalize(vec3(screen.x,screen.y+.03,-.83));
-          vec2 uv=vec2(fract(atan(ray.z,ray.x)/6.283185+.85+heading/6.283185), .07+.90*pow(screenUV.y,1.6));
+
+          vec2 uv=vec2(fract(screen.x*.45+.60-heading/6.283185), .03+.90*screenUV.y);
           vec3 color=texture2D(panorama,uv).rgb*.4;
           color+=texture2D(panorama,uv+texel*vec2(2.,1.)).rgb*.15;
           color+=texture2D(panorama,uv-texel*vec2(2.,1.)).rgb*.15;
