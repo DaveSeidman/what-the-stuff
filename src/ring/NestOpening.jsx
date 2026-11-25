@@ -95,6 +95,6 @@ export default function NestOpening({enabled,amount,onChange,handleRef,forceDemo
       onPointerDown={start} onPointerMove={move} onPointerUp={release} onPointerCancel={release} onLostPointerCapture={release}
       onKeyDown={key} onKeyUp={event=>{if(['ArrowUp','ArrowDown',' ','Enter'].includes(event.key))fall();}}
       onBlur={()=>{if(!demo&&!drag.current&&value.current>0)fall();}}/>}
-    {demo&&<div className="nest-opening-demo" aria-hidden="true"><div className="demo-baster" ref={fake}><BasterIcon pressed={pressed}/><span>{hint}</span></div></div>}
+    {demo&&<div className="nest-opening-demo" aria-hidden="true"><div className="demo-baster" ref={fake}><BasterIcon pressed={pressed}/>{!forceDemo&&<span>{hint}</span>}</div></div>}
   </>;
 }
