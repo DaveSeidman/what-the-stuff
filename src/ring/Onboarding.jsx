@@ -3,7 +3,7 @@ import {BasterIcon} from './BasterCursor';
 import NestOpening from './NestOpening';
 
 const example=['Turkey','Duck','Chicken'];
-export default function Onboarding({ready,stack,flight,targets,handleRef,amount,onChange,onPick,onComplete}){
+export default function Onboarding({ready,stack,flight,targets,handleRef,amount,onChange,onPick,onComplete,onUnpack,unpacking}){
   const [stage,setStage]=useState('combine'),[revealed,setRevealed]=useState(0),[pressed,setPressed]=useState(false);
   const cursor=useRef(null),lastPoint=useRef(null),pick=useRef(onPick);
   pick.current=onPick;
@@ -38,6 +38,7 @@ export default function Onboarding({ready,stack,flight,targets,handleRef,amount,
     frame=requestAnimationFrame(tick);
     return ()=>cancelAnimationFrame(frame);
   },[ready,stage,stack.length,flight]);
+  useEffect(()=>{if(stage==='returning'&&!unpacking&&stack.length===0)setStage('win');},[stage,unpacking,stack.length]);
   return <>
     <div className="onboarding-copy" aria-live="polite">
       <span>How to play · {stage==='combine'?'1':stage==='open'?'2':'3'} of 3</span>
@@ -47,6 +48,6 @@ export default function Onboarding({ready,stack,flight,targets,handleRef,amount,
     </div>
     {stage==='combine'&&<div className="nest-opening-demo" aria-hidden="true"><div className="demo-baster" ref={cursor}><BasterIcon pressed={pressed}/></div></div>}
     {stage==='combine'&&stack.length===3&&!flight&&<div className="celebration-leaves tutorial-confetti" aria-hidden="true">{Array.from({length:18},(_,i)=><i key={i} style={{'--angle':i*20+'deg','--delay':i%4*.07+'s'}}/>)}</div>}
-    {stage==='open'&&<NestOpening forceDemo demoSpeed={2} enabled={ready} handleRef={handleRef} amount={amount} onChange={onChange} onDemoComplete={()=>setStage('win')}/>}
+    {stage==='open'&&<NestOpening forceDemo demoSpeed={2} enabled={ready} handleRef={handleRef} amount={amount} onChange={onChange} onDemoComplete={()=>{setStage('returning');onUnpack();}}/>}
   </>;
 }

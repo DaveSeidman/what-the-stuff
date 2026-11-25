@@ -421,14 +421,15 @@ function RingGame({initial}){
   }
   useEffect(()=>{
     if(!unpacking||departing)return;
-    if(!nest.recent.length){setUnpacking(false);return;}
+    const current=onboarding?tutorialStack:nest.recent;
+    if(!current.length){setUnpacking(false);return;}
     const timer=setTimeout(()=>{
-      const name=nest.recent[nest.recent.length-1];
-      setDeparting(name);
-      setNest(previous=>({count:previous.count-1,recent:previous.recent.slice(0,-1)}));
+      setDeparting(current[current.length-1]);
+      if(onboarding)setTutorialStack(previous=>previous.slice(0,-1));
+      else setNest(previous=>({count:previous.count-1,recent:previous.recent.slice(0,-1)}));
     },200);
     return ()=>clearTimeout(timer);
-  },[unpacking,departing,nest.recent]);
+  },[unpacking,departing,nest.recent,onboarding,tutorialStack]);
   // Frame the innermost receiver for each new hop so deep nests stay playable.
   const visibleStack=onboarding?tutorialStack:free?nest.recent:stack;
   function finishOnboarding(){
@@ -466,7 +467,7 @@ function RingGame({initial}){
       {(!free||nest.count>0||unpacking)&&<div className="play-actions"><button className="restart-nest secondary" disabled={!!flight||closing||unpacking} onClick={startOver}>Start over</button></div>}
     </div>}
     <NestOpening handleRef={openHandle} enabled={!intro&&!onboarding&&!unpacking&&loaded&&visibleStack.length>0&&!flight&&!closing&&!(!free&&(complete||over))} amount={explode} onChange={setExplode}/>
-    {onboarding&&!intro&&<Onboarding ready={loaded} stack={tutorialStack} flight={tutorialFlight} targets={tutorialTargets} handleRef={openHandle} amount={explode} onChange={setExplode} onPick={setTutorialFlight} onComplete={finishOnboarding}/>}
+    {onboarding&&!intro&&<Onboarding unpacking={unpacking} onUnpack={()=>setUnpacking(true)} ready={loaded} stack={tutorialStack} flight={tutorialFlight} targets={tutorialTargets} handleRef={openHandle} amount={explode} onChange={setExplode} onPick={setTutorialFlight} onComplete={finishOnboarding}/>}
     {hover&&!intro&&!flight&&<output ref={hoverLabel} className="animal-name">{hover}</output>}
     {!intro&&!free&&(complete||over)&&<div className={"celebration-backdrop "+(leaving==='celebration'?'modal-leaving':'')}>
       <div className="celebration" role="dialog" aria-modal="true" aria-labelledby="celebration-title">
