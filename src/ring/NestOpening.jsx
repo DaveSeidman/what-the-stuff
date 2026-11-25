@@ -52,9 +52,10 @@ export default function NestOpening({enabled,amount,onChange,handleRef,forceDemo
         const progress=Math.max(0,Math.min(1,(t-.45)/1.1));
         const eased=progress*progress*(3-2*progress);
         if(fake.current)fake.current.style.transform=`translate(${x}px,${y-distance*eased}px)`;
-        setPressed(t>.45&&t<1.85);
+        const releaseAt=1.85+(forceDemo?demoSpeed:0);
+        setPressed(t>.45&&t<releaseAt);
         update(eased*.78);
-        if(t<1.85)frame.current=requestAnimationFrame(tick);
+        if(t<releaseAt)frame.current=requestAnimationFrame(tick);
         else{setHint('Release to close');fall();}
       }
       frame.current=requestAnimationFrame(tick);
