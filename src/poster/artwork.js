@@ -1,4 +1,4 @@
-import { BufferGeometry, Float32BufferAttribute, SphereGeometry } from 'three';
+import { BufferGeometry, Float32BufferAttribute, SphereGeometry, TubeGeometry, CatmullRomCurve3, Vector3 } from 'three';
 
 export function hillHeight(x,z) {
   return -180 + 11*Math.sin(x*.009+z*.009) + 6*Math.cos(x*.018-z*.013) - (z+180)*.07;
@@ -59,19 +59,50 @@ export function landscape({egg,box,cone,add},{ring=false,propHeight=hillHeight}=
   for(let i=0;i<15;i++) tree(-86+i*12,-206+Math.sin(i)*12,.36+(i%4)*.12,'pine');
   tree(-143,-81,1.05,'orange');tree(-164,-89,1.4,'red');tree(-187,-92,.94,'gold');
   tree(173,-156,.8,'green');tree(183,-160,.65,'pine');
-  const x=ring?492:123,z=ring?-616:-154,y=propHeight(x,z),size=ring?10:1;
+  const x=ring?260:123,z=ring?-1200:-154,y=propHeight(x,z),size=ring?10:1;
   const barnBox=(offset,dimensions,color,rotation)=>box(
     [x+offset[0]*size,y+offset[1]*size,z+offset[2]*size],
     dimensions.map(value=>value*size),color,rotation);
   const barnCone=(offset,top,bottom,height,color)=>cone(
     [x+offset[0]*size,y+offset[1]*size,z+offset[2]*size],
     top*size,bottom*size,height*size,color);
-  barnBox([0,8,0],[25,16,17],'red'); barnBox([-5,4,9],[6,8,1],'cream');
-  barnBox([7,9,9],[4,4,1],'plum');
+  barnBox([0,8,0],[25,16,17],'red');
+  for(const side of [-1,1]){
+    const gable=new BufferGeometry();
+    const corners=side>0?[-12.5,16,8.5,12.5,16,8.5,0,23,8.5]:[12.5,16,-8.5,-12.5,16,-8.5,0,23,-8.5];
+    gable.setAttribute('position',new Float32BufferAttribute(corners,3));gable.setIndex([0,1,2]);gable.computeVertexNormals();
+    add(gable,'red',[x,y,z],[size,size,size]);
+  }
+  // Vertical boards, pale corner trim, and a double wooden barn door.
+  for(let i=-6;i<=6;i++)barnBox([i*1.85,8,8.56],[.12,16,.16],'#964332');
+  for(const side of [-1,1])barnBox([side*12,8,8.8],[.65,16,.65],'cream');
+  barnBox([0,5.2,9],[10,10.4,.6],'#684533');
+  for(let i=0;i<10;i++)barnBox([-4.5+i,5.2,9.38],[.9,10.2,.25],i%2?'#8d6746':'#9d7650');
+  for(const side of [-1,1]){
+    barnBox([side*5.3,5.4,9.5],[.65,10.8,.6],'cream');
+    barnBox([side*2.5,5.2,9.75],[.5,10.6,.35],'#d3b58b',[0,0,side*25]);
+    barnBox([side*.5,5.3,10.05],[.18,1.2,.25],'dark');
+  }
+  barnBox([0,10.9,9.5],[11.3,.75,.6],'cream');
+  barnBox([0,14,8.9],[4,3.4,.45],'cream');
+  barnBox([0,14,9.2],[3,2.4,.3],'plum');
   barnBox([-6.5,19,0],[16,2,21],'wine',[0,0,30]);
   barnBox([6.5,19,0],[16,2,21],'plum',[0,0,-30]);
   barnCone([23,13,-4],4,4.5,26,'red');
-  barnCone([23,29,-4],.2,5.2,7,'dark');
+  const siloRoof=new SphereGeometry(1,32,16,0,Math.PI*2,0,Math.PI/2);
+  add(siloRoof,'#aab5b4',[x+23*size,y+26*size,z-4*size],[5.2*size,4*size,5.2*size]);
+  // Narrow raised seams give the rounded cap its standing-seam metal finish.
+  for(let rib=0;rib<12;rib++){
+    const angle=rib*Math.PI/6;
+    const points=[];
+    for(let step=0;step<=16;step++){
+      const theta=step*Math.PI/32;
+      points.push(new Vector3(x+(23+5.23*Math.sin(theta)*Math.cos(angle))*size,
+        y+(26+4.03*Math.cos(theta))*size,
+        z+(-4+5.23*Math.sin(theta)*Math.sin(angle))*size));
+    }
+    add(new TubeGeometry(new CatmullRomCurve3(points),24,.045*size,5,false),'#75898b');
+  }
 }
 
 // Feet are modeled in pairs so the perches read from either side.

@@ -54,6 +54,14 @@ export function printMaterial() {
         vec2 cell=fract(tiles)-.5;
         return .13*(1.-smoothstep(.24,.48,length(cell*vec2(1.,.82))));
       }
+      // Delayed color fronts expand from fixed points on the skin.
+      vec3 skinBloom(float distanceFromSource,float offset){
+        float beat=clockTime/4.8-distanceFromSource*.028+offset;
+        float tick=floor(beat);
+        vec3 a=.52+.38*cos(6.283*(hash(vec2(tick,17.+offset))+vec3(0.,.33,.67)));
+        vec3 b=.52+.38*cos(6.283*(hash(vec2(tick+1.,17.+offset))+vec3(0.,.33,.67)));
+        return mix(a,b,smoothstep(.12,.74,fract(beat)));
+      }
       void main() {
         vec3 n=normalize(vNormal);
         if(surface>1.5 && surface<3.5){
@@ -109,11 +117,12 @@ export function printMaterial() {
             // Raised scales affect the lighting while preserving the base dye.
             pigment=mix(shaded,ink,.35+.65*smoothstep(-.15,.85,light));
             if(surface>2.5){
-              float beat=clockTime/2.4;
-              float tick=floor(beat);
-              vec3 a=.48+.40*cos(6.283*(hash(vec2(tick,17.))+vec3(0.,.33,.67)));
-              vec3 b=.48+.40*cos(6.283*(hash(vec2(tick+1.,17.))+vec3(0.,.33,.67)));
-              vec3 dye=mix(a,b,smoothstep(.78,.97,fract(beat)));
+              vec3 skin=vPoint-bodyCenter;
+              float d0=length(skin-vec3(-10.,7.,7.));
+              float d1=length(skin-vec3(3.,1.,-10.));
+              float d2=length(skin-vec3(20.,-2.,3.));
+              vec3 weights=1./(vec3(3.)+vec3(d0*d0,d1*d1,d2*d2)*.025);
+              vec3 dye=(skinBloom(d0,0.)*weights.x+skinBloom(d1,.37)*weights.y+skinBloom(d2,.71)*weights.z)/(weights.x+weights.y+weights.z);
               pigment=mix(pigment,pigment*dye*2.0,.78*(1.-feature));
             }
           }else if(surface<4.5 || (surface>5.5 && surface<6.5)){
@@ -149,7 +158,7 @@ export function printMaterial() {
           vec3 mist=vec3(.38,.52,.37);
           pigment=mix(pigment,mist,.78*smoothstep(180.,1900.,distance));
         }
-        float opacity=environment>.5 ? 1.-smoothstep(210.,480.,length(vWorld.xz)) : 1.;
+        float opacity=environment>.5 ? 1.-smoothstep(1500.,1800.,length(vWorld.xz)) : 1.;
         if(opacity<.01)discard;
         gl_FragColor=vec4(pigment,opacity);
         #include <colorspace_fragment>

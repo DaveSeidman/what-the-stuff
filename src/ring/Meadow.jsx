@@ -37,7 +37,7 @@ function meadow(tools){
   const {add,egg}=tools;
   const vertices=[],indices=[];
   for(let r=0;r<=80;r++) for(let j=0;j<=96;j++){
-    const radius=r<45?r*5.6:252+(r-45)*25;
+    const radius=r<45?r*5.6:252+(r-45)*46;
     const a=j*Math.PI/48,x=Math.cos(a)*radius,z=Math.sin(a)*radius;
     vertices.push(x,ground(x,z),z);
     if(r&&j){const i=r*97+j;indices.push(i,i-1,i-98,i,i-98,i-97);}
