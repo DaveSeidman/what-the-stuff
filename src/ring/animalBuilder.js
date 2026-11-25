@@ -76,9 +76,11 @@ function sculpt(name,{egg},features) {
   }
   if(name==='Pig'){
     oval(-10,31,0,10,9,9);
-    oval(-20,29,0,6,4.6,6,'#edb2af');
+    oval(-19,29,0,6.5,5.2,6.6,'#e9a0a0');
+    // A broad, flattened nose plate with two forward-facing oval nostrils.
+    oval(-24.5,29,0,2.3,4.8,6.7,'#f0b3b0');
     for(const side of [-1,1]){
-      oval(-25.3,29,side*2.5,.9,1.2,.9,'#914e59');
+      oval(-26.35,29,side*2.7,.7,1.55,1.15,'#914e59');
       oval(-7,39,side*6,4,6,3.3,fur,side*22);
       oval(-8,39.5,side*6.5,2.4,3.6,1.8,'#d77f8c',side*22);
       oval(-5,18,side*13,4.4,6,3.6,fur,-20);

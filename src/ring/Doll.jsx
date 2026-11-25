@@ -53,7 +53,8 @@ function surfaceFor(name){
   if(name==='Tortoise')return 6;
   if(name==='Zebra')return 7;
   if(['Alligator','Crocodile','Iguana','Salmon'].includes(name))return 2;
-  if(['Lobster','Crab'].includes(name))return 4;
+  if(name==='Lobster')return 8;
+  if(name==='Crab')return 4;
   return 5;
 }
 export function Doll({geometry,shell,lidRef,impact=0,name,tuck}){

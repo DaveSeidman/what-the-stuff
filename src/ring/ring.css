@@ -128,3 +128,15 @@ body:has(.ring-game){margin:0;background:#f6ebce;color:#293f38;font-family:Georg
 body[data-nest-demo] .gravy-effects{display:none!important}
 .ring-game button{-webkit-tap-highlight-color:transparent}
 .intro-history a{margin-block:10px}
+
+.onboarding-copy{position:absolute;top:90px;left:50%;transform:translateX(-50%);width:100%;padding:0 24px;text-align:center;color:#5b3528;text-shadow:0 1px 6px #fff1d0;pointer-events:none;z-index:3}
+.onboarding-copy>span{font:600 .76rem system-ui,sans-serif}
+.onboarding-copy h2{font:400 clamp(1.7rem,4vw,3.1rem)/1.12 'Agrave Pro',Georgia,serif;margin:8px 0 12px}
+.onboarding-copy p{font:1rem/1.5 Georgia,serif;max-width:680px;margin:auto}
+.tutorial-equation strong{font:400 clamp(1.4rem,3vw,2.1rem) 'BBH Bogle',Georgia,serif}
+.tutorial-equation span:not(.revealed){opacity:0}
+.tutorial-equation>span:first-of-type{opacity:1}
+.tutorial-equation .revealed{animation:feast-pop .35s ease both}
+.tutorial-confetti{z-index:4;left:50%;top:50%}
+.tutorial-actions{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:41}
+@media(max-width:650px){.onboarding-copy{top:78px;padding:0 16px}.onboarding-copy p{font-size:.88rem}.onboarding-copy h2{font-size:1.65rem}.tutorial-actions{bottom:18px}}

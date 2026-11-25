@@ -85,7 +85,7 @@ export function printMaterial() {
           ink=mix(ink,butter,smoothstep(.78,.80,band));
           ink=mix(ink,butter,(1.-smoothstep(.015,.035,abs(vLocal.x+.04*vLocal.y)))*.28);
         }
-        if(surface>6.5){
+        if(surface>6.5 && surface<7.5){
           vec3 body=vPoint-bodyCenter;
           float stripes=sin(body.x*.95+sin(body.y*.22)*.8+body.z*.15);
           float whiteFur=smoothstep(.025,.20,min(ink.r,min(ink.g,ink.b)));
@@ -143,6 +143,22 @@ export function printMaterial() {
           pigment=mix(pigment,butter,.79*smoothstep(.43,.98,glaze));
         }
         if(vType>3.5) pigment=ink;
+        if(surface>7.5){
+          // Lobster carapace: smooth red shell, fine mottling and tail segments.
+          vec3 shellPoint=vPoint-bodyCenter;
+          float flecks=smoothstep(.62,.84,noise(p*2.7));
+          pigment*=.92+.12*noise(p*.6);
+          pigment=mix(pigment,pigment*vec3(1.15,.78,.59),flecks*.2);
+          float tail=smoothstep(5.,11.,shellPoint.x);
+          float seam=1.-smoothstep(.045,.15,abs(sin(shellPoint.x*1.6)));
+          pigment*=1.-.23*tail*seam;
+          vec3 lamp=normalize(vec3(-.4,.7,.6));
+          #if NUM_DIR_LIGHTS > 0
+            lamp=directionalLights[0].direction;
+          #endif
+          float sheen=pow(max(0.,dot(n,normalize(lamp+vec3(0.,0.,1.)))),55.);
+          pigment+=vec3(1.,.82,.68)*sheen*.6;
+        }
         float skip=smoothstep(.78,.96,grain)*.18;
         if(surface<.5 && vType>.5 && vType<3.) skip+=smoothstep(.71,.9,brush)*.105;
         pigment=mix(pigment,butter,skip);
