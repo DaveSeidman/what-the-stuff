@@ -74,7 +74,7 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
     controls.minPolarAngle=Math.PI*.36;
     controls.maxPolarAngle=Math.PI*.42;
     const distance=camera.position.distanceTo(controls.target);
-    controls.minDistance=distance*.85;
+    controls.minDistance=distance*.7;
     controls.maxDistance=distance*1.28;
     controls.enablePan=false;
     controls.rotateSpeed=.65;
@@ -90,11 +90,11 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
     const controls=controlsRef.current;
     const distance=camera.position.distanceTo(controls.target);
     const pixelsPerUnit=size.height/(2*distance*Math.tan(camera.fov*Math.PI/360));
-    const fit=Math.min(size.width/370,size.height/270)/pixelsPerUnit;
+    const fit=Math.min(size.width/370,size.height/270)/pixelsPerUnit*(size.width<=650?1.1:1);
     const ratio=fitZoom.current ? camera.zoom/fitZoom.current : 1;
     fitZoom.current=fit;
     controls.minZoom=fit*.85;
-    controls.maxZoom=fit*1.3;
+    controls.maxZoom=fit*1.5;
     camera.zoom=Math.max(controls.minZoom,Math.min(controls.maxZoom,fit*ratio));
     camera.updateProjectionMatrix();
   },[camera,size]);
@@ -104,11 +104,11 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
     const height=spread.height;
     const distance=camera.position.distanceTo(controlsRef.current.target);
     const pixelsPerUnit=size.height/(2*distance*Math.tan(camera.fov*Math.PI/360));
-    const fit=Math.min(size.width/370,size.height/(270+explode*height))/pixelsPerUnit;
+    const fit=Math.min(size.width/370,size.height/(270+explode*height))/pixelsPerUnit*(size.width<=650?1.1:1);
     cameraGoal.current={y:summit+18+explode*height*.40,zoom:fit};
     fitZoom.current=fit;
     controlsRef.current.minZoom=fit*.85;
-    controlsRef.current.maxZoom=fit*1.3;
+    controlsRef.current.maxZoom=fit*1.5;
   },[explode,stack.length,size]);
   useLayoutEffect(()=>{elapsed.current=0;landed.current=false;},[flight]);
   useFrame(({clock},delta)=>{
