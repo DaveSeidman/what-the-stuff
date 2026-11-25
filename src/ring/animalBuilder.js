@@ -4,12 +4,12 @@ export {animals} from './animals';
 import {animals} from './animals';
 const colors = {Turkey:'#b95d3b',Duck:'sun',Chicken:'cream',Tiger:'orange',Giraffe:'gold',Zebra:'white',Llama:'cream',Kangaroo:'#cb8544',
   Alligator:'pine',Crocodile:'#84994c',Chameleon:'#96b851',Iguana:'green',Tortoise:'#738c50',Lobster:'red',
-  Crab:'orange',Octopus:'#ac5676',Salmon:'#76a59b',Ostrich:'plum',Penguin:'dark',Pig:'#e9a0a0'};
+  Crab:'#936344',Octopus:'#ac5676',Salmon:'#76a59b',Ostrich:'plum',Penguin:'dark',Pig:'#e9a0a0'};
 
 const bellyRadius = 16;
 const bellyY = 18;
 
-function sculpt(name,{egg},features) {
+function sculpt(name,{egg,cone},features) {
   const fur=colors[name];
   function oval(x,y,z,rx,ry,rz,color=fur,tilt=0){
     // Pull high features toward the round torso while preserving the belly.
@@ -44,7 +44,13 @@ function sculpt(name,{egg},features) {
     }
     if(!octopus) for(const side of [-1,1]){
       oval(-9,18,side*14,6,5,4);
-      oval(-13,21,side*15,3,3,2.8);
+      oval(-13,21,side*16,5,4.6,4);
+      for(const jaw of [-1,1]){
+        oval(-18,21+jaw*3.2,side*17,5.5,1.8,2.7,fur,jaw*8);
+        // Pointed teeth and carapace spines, rather than rounded paw shapes.
+        for(let tooth=0;tooth<3;tooth++)cone([-16-tooth*2,21+jaw*1.9,side*17],.06,.65,2.1,fur,10,[0,0,jaw>0?180:0]);
+      }
+      for(let spike=0;spike<3;spike++)cone([-9-spike*2.4,25,side*17],.04,.95,3.7,fur,12,[0,0,12-spike*12]);
     }
     if(name==='Lobster') oval(15,12,0,7,4,7,'flame');
     eyes(-12,25,8); return;
@@ -70,6 +76,7 @@ function sculpt(name,{egg},features) {
       for(let i=-2;i<=2;i++) egg([13,25-Math.abs(i),i*4],[5,10,4.4],i%2?'orange':'gold',[i*18,0,-17],1);
       oval(-16,27,3,2.8,4.8,2.8,'red');
     }
+    if(name==='Duck')for(const z of [-3.5,0,3.5])cone([17,20,z],.12,2.7,11,'sun',16,[0,0,-65]);
     if(name==='Chicken') for(let i=-1;i<=1;i++) oval(-10+i*3.7,40-Math.abs(i),0,3,3.5,2.5,'red');
     if(name==='Penguin') oval(-10,18,0,7,11,10,'white');
     return;

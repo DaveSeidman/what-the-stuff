@@ -16,11 +16,11 @@ export function printMaterial() {
       #include <shadowmap_pars_vertex>
       attribute vec3 ink, localPoint;
       attribute float paintType;
-      varying vec3 vInk, vPoint, vLocal, vNormal, vWorld, vViewPosition;
+      varying vec3 vInk, vPoint, vLocal, vNormal, vWorld, vViewPosition, vObjectNormal;
       varying float vType;
       void main() {
         vInk=ink; vPoint=position; vLocal=localPoint; vType=paintType;
-        vNormal=normalMatrix*normal;
+        vNormal=normalMatrix*normal;vObjectNormal=normal;
         vec3 transformedNormal=vNormal;
         vec4 worldPosition=modelMatrix*vec4(position,1.);
         vViewPosition=(modelViewMatrix*vec4(position,1.)).xyz;
@@ -36,7 +36,7 @@ export function printMaterial() {
       #include <shadowmask_pars_fragment>
       uniform float surface, clockTime, environment;
       uniform vec3 maroon, butter, tangerine, bodyCenter;
-      varying vec3 vInk, vPoint, vLocal, vNormal, vWorld, vViewPosition;
+      varying vec3 vInk, vPoint, vLocal, vNormal, vWorld, vViewPosition, vObjectNormal;
       varying float vType;
       float hash(vec2 p) {
         vec3 q=fract(p.xyx*vec3(.1031,.1030,.0973));
@@ -54,6 +54,23 @@ export function printMaterial() {
         vec2 cell=fract(tiles)-.5;
         return .13*(1.-smoothstep(.24,.48,length(cell*vec2(1.,.82))));
       }
+      float hexEdge(vec2 p){
+        vec2 grid=vec2(1.,1.73205);
+        vec2 a=mod(p,grid)-grid*.5,b=mod(p-grid*.5,grid)-grid*.5;
+        vec2 cell=abs(dot(a,a)<dot(b,b)?a:b);
+        return .5-max(cell.x,dot(cell,vec2(.5,.866025)));
+      }
+      float shellEdge(vec3 p){
+        vec3 w=pow(abs(normalize(vObjectNormal)),vec3(5.));w/=w.x+w.y+w.z;
+        return hexEdge(p.yz/6.)*w.x+hexEdge(p.xz/6.)*w.y+hexEdge(p.xy/6.)*w.z;
+      }
+      float fishHeight(vec3 point){
+        vec2 p=point.xy*1.15;
+        p.x+=mod(floor(p.y),2.)*.5;
+        vec2 cell=fract(p)-.5;
+        float arc=abs(length(vec2(cell.x,cell.y+.45))-.5);
+        return .035*(1.-smoothstep(.025,.1,arc));
+      }
       // Delayed color fronts expand from fixed points on the skin.
       vec3 skinBloom(float distanceFromSource,float offset){
         float beat=clockTime/4.8-distanceFromSource*.028+offset;
@@ -64,12 +81,21 @@ export function printMaterial() {
       }
       void main() {
         vec3 n=normalize(vNormal);
-        if(surface>1.5 && surface<3.5){
-          float height=scaleHeight(vPoint.xy+vPoint.z*vec2(.31,.23));
+        vec3 body=vPoint-bodyCenter;
+        float shellMask=smoothstep(.025,.12,vInk.r-vInk.g)*smoothstep(-2.,2.,body.y);
+        float relief=0.;
+        if(surface>1.5 && surface<3.5)relief=scaleHeight(vPoint.xy+vPoint.z*vec2(.31,.23));
+        if(surface>3.5 && surface<4.5)relief=.035*noise((vPoint.xy+vPoint.z*.3)*4.);
+        if(surface>5.5 && surface<6.5)relief=.24*smoothstep(.015,.13,shellEdge(body))*shellMask;
+        if(surface>8.5 && surface<9.5)relief=fishHeight(vPoint);
+        if(surface>9.5 && surface<10.5)relief=.19*scaleHeight((vPoint.xy+vPoint.z*vec2(.23,.41))*.7);
+        if(surface>10.5 && surface<11.5)relief=.018*noise(vec2(body.x*4.,body.y*.6+body.z*.9));
+        if(surface>11.5 && surface<12.5)relief=.012*noise(vec2(body.x*.7+body.z,body.y*5.));
+        if(surface>1.5){
           vec3 dx=dFdx(vViewPosition),dy=dFdy(vViewPosition);
           vec3 r1=cross(dy,n),r2=cross(n,dx);
           float det=dot(dx,r1);
-          vec3 gradient=sign(det)*(dFdx(height)*r1+dFdy(height)*r2);
+          vec3 gradient=sign(det)*(dFdx(relief)*r1+dFdy(relief)*r2);
           n=normalize(abs(det)*n-gradient);
         }
         // Object-anchored marks follow the sculpture as the camera moves.
@@ -90,6 +116,31 @@ export function printMaterial() {
           float stripes=sin(body.x*.95+sin(body.y*.22)*.8+body.z*.15);
           float whiteFur=smoothstep(.025,.20,min(ink.r,min(ink.g,ink.b)));
           ink=mix(ink,mix(vec3(.021,.032,.029),ink,smoothstep(-.10,.12,stripes)),whiteFur*.93);
+        }
+        float coloredSkin=smoothstep(.04,.16,max(ink.r,max(ink.g,ink.b)));
+        if(surface>5.5 && surface<6.5){
+          float edge=shellEdge(body);
+          vec3 scute=mix(vec3(.09,.065,.025),ink,smoothstep(.015,.08,edge));
+          scute*=.9+.2*smoothstep(.07,.25,edge);
+          ink=mix(ink,scute,shellMask);
+        }
+        if(surface>8.5 && surface<9.5){
+          float fishSkin=smoothstep(.015,.09,ink.b-ink.r);
+          vec3 silver=mix(ink,vec3(.5,.65,.64),.35);
+          float lateral=exp(-pow((body.y-1.)*.6,2.));
+          ink=mix(ink,silver*(1.-.22*lateral),fishSkin);
+        }
+        if(surface>9.5 && surface<10.5){
+          float speckle=noise((body.xy+body.z*.3)*.8);
+          ink*=1.-.14*smoothstep(.65,.84,speckle)*coloredSkin;
+        }
+        if(surface>10.5 && surface<11.5){
+          float stripes=sin(body.x*1.15+sin(body.y*.37+body.z*.2)*1.4);
+          ink=mix(ink,vec3(.035,.026,.018),smoothstep(.45,.62,stripes)*coloredSkin*.9);
+        }
+        if(surface>11.5 && surface<12.5){
+          float patches=smoothstep(.05,.12,hexEdge((body.xy+body.z*vec2(.3,.2))/5.5));
+          ink=mix(ink,mix(vec3(.88,.67,.29),vec3(.35,.15,.055),patches),coloredSkin*.8);
         }
         float light=.5;
         #if NUM_DIR_LIGHTS > 0
@@ -143,7 +194,7 @@ export function printMaterial() {
           pigment=mix(pigment,butter,.79*smoothstep(.43,.98,glaze));
         }
         if(vType>3.5) pigment=ink;
-        if(surface>7.5){
+        if(surface>7.5 && surface<8.5){
           // Lobster carapace: smooth red shell, fine mottling and tail segments.
           vec3 shellPoint=vPoint-bodyCenter;
           float flecks=smoothstep(.62,.84,noise(p*2.7));
@@ -158,6 +209,14 @@ export function printMaterial() {
           #endif
           float sheen=pow(max(0.,dot(n,normalize(lamp+vec3(0.,0.,1.)))),55.);
           pigment+=vec3(1.,.82,.68)*sheen*.6;
+        }
+        if(surface>8.5 && surface<9.5){
+          vec3 lamp=normalize(vec3(-.4,.7,.6));
+          #if NUM_DIR_LIGHTS > 0
+            lamp=directionalLights[0].direction;
+          #endif
+          float shine=pow(max(0.,dot(n,normalize(lamp+vec3(0.,0.,1.)))),72.);
+          pigment+=vec3(.7,.85,1.)*shine*.65;
         }
         float skip=smoothstep(.78,.96,grain)*.18;
         if(surface<.5 && vType>.5 && vType<3.) skip+=smoothstep(.71,.9,brush)*.105;

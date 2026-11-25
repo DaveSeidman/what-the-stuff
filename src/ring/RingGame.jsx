@@ -3,7 +3,7 @@ import {Canvas,useFrame,useLoader,useThree} from '@react-three/fiber';
 import {TOUCH,Object3D,PCFShadowMap,Vector3} from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {AnimalLoader} from './AnimalLoader';
-import {animals,combinationName} from './animals';
+import {animals,combinationName,combinationParts} from './animals';
 import {makeRounds} from './rounds';
 import Countryside from './Countryside';
 import {Meadow,ground,summit} from './Meadow';
@@ -19,8 +19,7 @@ import {readRoute,freeRoute,quizRoute,shareUrl} from './routes';
 const watercolorSettings={enabled:true,spill:12,strength:.69,pooling:.36,paperScale:1.75,wetness:.80,depthProtection:.85};
 import './ring.css';
 
-const ringOrder=animals.filter(name=>name!=='Lobster');
-ringOrder.splice(ringOrder.indexOf('Penguin')+1,0,'Lobster');
+const ringOrder=['Turkey','Salmon','Giraffe','Tortoise','Pig','Crab','Duck','Alligator','Tiger','Penguin','Iguana','Llama','Lobster','Chicken','Crocodile','Zebra','Octopus','Kangaroo','Chameleon','Ostrich'];
 const ring=animals.map(name=>{
   const i=ringOrder.indexOf(name);
   const angle=2*Math.PI*i/animals.length+.08;
@@ -440,8 +439,8 @@ function RingGame({initial}){
       <span>Score {score} / 5</span><div className="score-dots">{rounds.map((_,i)=><i key={i} aria-label={results[i]===undefined?'Round '+(i+1):results[i]?'Correct':'Completed with help'} className={results[i]===undefined?(i===round?'current':''):results[i]?'won':'helped'}/>)}</div>
     </div>}
     {!intro&&!onboarding&&!over&&!(complete&&!free)&&<div className="build-prompt" aria-live="polite">
-      <span>{onboarding?'A quick peek inside':free?'Let’s get stuffed!':`Combination ${round+1} of 5 · build the`}</span>
-      <FittedName>{onboarding?'Drag up to open':free?(nest.count?freeName:'Pick an animal'):word}</FittedName>
+      <span key={`progress-${free}-${round}`} className="combination-progress">{onboarding?'A quick peek inside':free?'Let’s get stuffed!':`Combination ${round+1} of 5 · build the`}</span>
+      <FittedName parts={free?(nest.count?combinationParts(nest.recent):undefined):combinationParts(order)}>{onboarding?'Drag up to open':free?(nest.count?freeName:'Pick an animal'):word}</FittedName>
       <p>{onboarding?'Release to let the lids drop back down.':flight?flight+' is hopping in…':hint|| (free?'Pick anyone. Drag up to peek inside.':stack.length?stack.join(' + ')+' · Who goes next?':`Choose three animals, starting with ${order[0]}.`)}</p>
       <div className="play-actions"><button className="restart-nest secondary" disabled={!!flight||closing} onClick={startOver}>Start over</button></div>
     </div>}

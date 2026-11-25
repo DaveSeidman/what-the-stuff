@@ -1,7 +1,7 @@
 import React,{useLayoutEffect,useRef} from 'react';
 
 // Measure at the responsive CSS size, then shrink only when the name overflows.
-export default function FittedName({children}){
+export default function FittedName({children,parts}){
   const heading=useRef(null);
   useLayoutEffect(()=>{
     const element=heading.current;
@@ -20,5 +20,5 @@ export default function FittedName({children}){
     document.fonts?.ready.then(fit);
     return ()=>{disposed=true;observer.disconnect();};
   },[children]);
-  return <h1 className="fitted-name" ref={heading}><span>{children}</span></h1>;
+  return <h1 className="fitted-name" ref={heading} aria-label={parts?children:undefined}><span aria-hidden={parts?true:undefined}>{parts?parts.map((part,i)=><span key={`${children}-${i}`} className="combo-syllable" style={{animationDelay:`${.18+i*.28}s`}}>{part}</span>):children}</span></h1>;
 }

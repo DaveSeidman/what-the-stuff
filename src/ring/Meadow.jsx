@@ -1,6 +1,6 @@
 import React,{useMemo,useRef} from 'react';
 import {useFrame} from '@react-three/fiber';
-import {BufferGeometry,Float32BufferAttribute,DoubleSide} from 'three';
+import {BufferGeometry,Float32BufferAttribute,DoubleSide,Shape,ShapeGeometry,Vector3,CatmullRomCurve3,TubeGeometry} from 'three';
 import {landscape} from '../poster/artwork';
 import {model} from '../poster/sculpture';
 import {animals} from './animals';
@@ -61,6 +61,25 @@ function meadow(tools){
     for(let i=0;i<7;i++) egg([x*1.35+Math.sin(i*3)*6*s,ground(x*1.35,z*1.35)+(20+i%4*3)*s,z*1.35+(4+i%3)*s],[2*s,2.1*s,2*s],'red');
   }
 }
+function autumnLeaf(color){
+  return model(({add})=>{
+    const outline=[[0,-4],[.4,-2.8],[1.4,-3.1],[1.3,-1.7],[3,-2],[2.2,-.6],[3.6,.1],[2,1],[2.2,2.6],[.8,2],[0,4],[-.8,2],[-2.2,2.6],[-2,1],[-3.6,.1],[-2.2,-.6],[-3,-2],[-1.3,-1.7],[-1.4,-3.1],[-.4,-2.8]];
+    const curve=(x,z)=>.12*x*x+.65*Math.sin(z*.6);
+    const shape=new Shape();outline.forEach(([x,z],i)=>i?shape.lineTo(x,z):shape.moveTo(x,z));shape.closePath();
+    const g=new ShapeGeometry(shape),positions=g.attributes.position;
+    for(let i=0;i<positions.count;i++){
+      const x=positions.getX(i),z=positions.getY(i);
+      positions.setXYZ(i,x,curve(x,z),z);
+    }
+    g.computeVertexNormals();add(g,color);
+    function vein(points,radius){
+      const path=new CatmullRomCurve3(points.map(([x,z])=>new Vector3(x,curve(x,z)+.035,z)));
+      add(new TubeGeometry(path,12,radius,4,false),'#92582d');
+    }
+    vein([[0,-4.7],[0,-2],[0,0],[0,2],[0,3.7]],.045);
+    for(const side of [-1,1])for(const [x,z] of [[2.7,-1.8],[3.1,.2],[1.9,2.2]])vein([[0,z-1.4],[side*x*.5,z-.5],[side*x,z]],.025);
+  });
+}
 export function Meadow({material}){
   const terrain=useMemo(()=>model(t=>{
     landscape(t,{ring:true, propHeight:(x,z)=>ground(x,z)});
@@ -78,7 +97,8 @@ export function Meadow({material}){
     ink.transparent=true;
     return ink;
   },[]);
-  const leaf=useMemo(()=>model(({egg})=>egg([0,0,0],[2.3,.6,4],'orange')),[]);
+  const leaf=useMemo(()=>['orange','gold','red'].map(autumnLeaf),[]);
+  const leafInk=useMemo(()=>{const ink=printMaterial();ink.side=DoubleSide;return ink;},[]);
   const leaves=useRef();
   useFrame(({clock})=>{
     const t=clock.elapsedTime;
@@ -90,5 +110,5 @@ export function Meadow({material}){
     });
   });
   return <><mesh receiveShadow geometry={terrain} material={backdrop}/><mesh receiveShadow geometry={grass} material={grassInk}/>
-    <group ref={leaves}>{Array.from({length:12},(_,i)=><mesh key={i} geometry={leaf} material={material}/>)}</group></>;
+    <group ref={leaves}>{Array.from({length:12},(_,i)=><mesh key={i} geometry={leaf[i%leaf.length]} material={leafInk}/>)}</group></>;
 }
