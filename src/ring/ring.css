@@ -130,3 +130,6 @@ body:has(.ring-game){margin:0;background:#f6ebce;color:#293f38;font-family:Georg
 .ring-game .site-share .share-button{min-height:0;padding:6px 9px;border:0;border-radius:8px;background:#fff3d9d9;color:#49382c;font:400 .75rem system-ui,sans-serif;text-decoration:underline;text-underline-offset:3px}
 .site-share .share-button svg{display:none}
 .site-share{bottom:max(12px,env(safe-area-inset-bottom))}
+
+.explode-control{z-index:2}
+.explode-control input{touch-action:none}

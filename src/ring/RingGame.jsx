@@ -35,7 +35,7 @@ function openingEase(progress){
   const t=(low+high)/2;
   return 3*(1-t)*t*t+t*t*t;
 }
-function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,explodeAnchor,hover,hoverLabel,wrongPick}){
+function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,explodeAnchor,explodeDragging,hover,hoverLabel,wrongPick}){
   const {camera,size,gl}=useThree();
   const hoverPoint=useMemo(()=>new Vector3(),[]);
   const anchorPoint=useMemo(()=>new Vector3(),[]),cameraRight=useMemo(()=>new Vector3(),[]);
@@ -170,7 +170,7 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       ? previousPlaces[0].scale+(places[0].scale-previousPlaces[0].scale)*outerGrow
       : 1;
     const bellyCenter=places.length?shells[places[0].index].seam*outerScale:0;
-    if(explodeAnchor.current){
+    if(explodeAnchor.current&&!explodeDragging.current){
       const width=places.length?Math.max(...places.map(p=>shells[p.index].width*p.scale)):40;
       const height=places.length?shells[places[0].index].height*outerScale:40;
       anchorPoint.set(0,summit+height/2+(spread.height-height)*explode/2,0);
@@ -299,7 +299,7 @@ function RingGame({initial}){
   const watercolor=watercolorSettings;
   const [intro,setIntro]=useState(initial.mode==='intro');
   const gameStarted=useRef(initial.mode==='quiz'?performance.now()-(initial.elapsed||0)*1000:null);
-  const explodeAnchor=useRef(null),hoverLabel=useRef(null);
+  const explodeAnchor=useRef(null),hoverLabel=useRef(null),explodeDragging=useRef(false);
   const [completionSeconds,setCompletionSeconds]=useState(initial.over?initial.elapsed:null);
   const [leaving,setLeaving]=useState('');
   const [wrongPick,setWrongPick]=useState(null);
@@ -391,7 +391,7 @@ function RingGame({initial}){
   return <main className="ring-game">
     <section className="pasture" aria-label={free?'Free nesting animal ring':'Animal ring. Build '+word}>
       <Canvas shadows={{type:PCFShadowMap}} flat dpr={[1,1.4]} camera={{fov:50,near:1,far:9000}}>
-        <Suspense fallback={null}><World wrongPick={wrongPick} hover={hover} hoverLabel={hoverLabel} explodeAnchor={explodeAnchor} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
+        <Suspense fallback={null}><World wrongPick={wrongPick} hover={hover} hoverLabel={hoverLabel} explodeAnchor={explodeAnchor} explodeDragging={explodeDragging} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
       </Canvas>
     </section>
     <ShareButton className="site-share" url={intro?undefined:shareUrl(currentRoute)} text={free&&nest.count>0?`Check out the ${freeName} I made at What-the-stuff.com!`:undefined}/>
@@ -407,7 +407,15 @@ function RingGame({initial}){
     </div>}
     {!intro&&visibleStack.length>0&&<label ref={explodeAnchor} className="explode-control">
       <input aria-label="Explode animal nest" type="range" min="0" max="100" value={Math.round(explode*100)}
-        disabled={!!flight||closing||visibleStack.length<2} onChange={e=>setExplode(Number(e.target.value)/100)}/>
+        disabled={!!flight||closing}
+        onPointerDown={e=>{explodeDragging.current=true;e.currentTarget.setPointerCapture(e.pointerId);}}
+        onPointerUp={()=>{explodeDragging.current=false;}}
+        onPointerCancel={()=>{explodeDragging.current=false;}}
+        onLostPointerCapture={()=>{explodeDragging.current=false;}}
+        onKeyDown={()=>{explodeDragging.current=true;}}
+        onKeyUp={()=>{explodeDragging.current=false;}}
+        onBlur={()=>{explodeDragging.current=false;}}
+        onChange={e=>setExplode(Number(e.target.value)/100)}/>
     </label>}
     {hover&&!intro&&!flight&&<output ref={hoverLabel} className="animal-name">{hover}</output>}
     {!intro&&!over&&<div className="animal-picker">
