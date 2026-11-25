@@ -41,7 +41,6 @@ export default function Onboarding({ready,stack,flight,targets,handleRef,amount,
   useEffect(()=>{if(stage==='returning'&&!unpacking&&stack.length===0)setStage('win');},[stage,unpacking,stack.length]);
   return <>
     <div className="onboarding-copy" aria-live="polite">
-      <span>How to play · {stage==='combine'?'1':stage==='open'?'2':'3'} of 3</span>
       <h2>{stage==='combine'?'Combine animals to form the word':stage==='open'?'Pull up to open':'Match them all to win!'}</h2>
       {stage==='combine'?<p className="tutorial-equation"><strong>Turducken</strong><span> = </span>{example.map((animal,i)=><React.Fragment key={animal}>{i>0&&<span className={revealed>i?'revealed':''}> + </span>}<span className={revealed>i?'revealed':''}>{animal}</span></React.Fragment>)}</p>:<p>{stage==='open'?'Drag the animal upward to peek inside. Release to let the lids fall back down.':'Make all five combinations. Every animal has a part to play!'}</p>}
       {stage==='win'&&<div className="tutorial-actions"><button className="primary" onClick={onComplete}>Let’s Play</button></div>}
