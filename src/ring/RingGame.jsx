@@ -404,6 +404,11 @@ function RingGame({initial}){
     setRound(r=>r+1);setStack([]);setHint('');setMissed(false);setHover('');
   }
   function restart(){gameStarted.current=performance.now();setCompletionSeconds(null);setRounds(makeRounds());setResults([]);setRound(0);setScore(0);setStack([]);setMissed(false);setHint('');setOver(false);}
+  function startOver(){
+    if(flight||closing)return;
+    setExplode(0);setHover('');setHint('');
+    if(free)setNest({count:0,recent:[]});else restart();
+  }
   // Frame the innermost receiver for each new hop so deep nests stay playable.
   const visibleStack=onboarding?tutorialStack:free?nest.recent:stack;
   function finishOnboarding(){
@@ -438,13 +443,11 @@ function RingGame({initial}){
       <span>{onboarding?'A quick peek inside':free?'Let’s get stuffed!':`Combination ${round+1} of 5 · build the`}</span>
       <FittedName>{onboarding?'Drag up to open':free?(nest.count?freeName:'Pick an animal'):word}</FittedName>
       <p>{onboarding?'Release to let the lids drop back down.':flight?flight+' is hopping in…':hint|| (free?'Pick anyone. Drag up to peek inside.':stack.length?stack.join(' + ')+' · Who goes next?':`Choose three animals, starting with ${order[0]}.`)}</p>
+      <div className="play-actions"><button className="restart-nest secondary" disabled={!!flight||closing} onClick={startOver}>Start over</button></div>
     </div>}
     <NestOpening handleRef={openHandle} enabled={!intro&&!onboarding&&loaded&&visibleStack.length>0&&!flight&&!closing&&!(!free&&(complete||over))} amount={explode} onChange={setExplode}/>
     {onboarding&&!intro&&<Onboarding ready={loaded} stack={tutorialStack} flight={tutorialFlight} targets={tutorialTargets} handleRef={openHandle} amount={explode} onChange={setExplode} onPick={setTutorialFlight} onComplete={finishOnboarding}/>}
     {hover&&!intro&&!flight&&<output ref={hoverLabel} className="animal-name">{hover}</output>}
-    {!intro&&!over&&<div className="animal-picker">
-      {free&&nest.count>0&&<button className="restart-nest" disabled={!!flight||closing} onClick={()=>{setNest({count:0,recent:[]});setExplode(0);setHover('');}}>Restart</button>}
-    </div>}
     {!intro&&!free&&(complete||over)&&<div className={"celebration-backdrop "+(leaving==='celebration'?'modal-leaving':'')}>
       <div className="celebration" role="dialog" aria-modal="true" aria-labelledby="celebration-title">
         <div className="celebration-leaves" aria-hidden="true">{Array.from({length:18},(_,i)=><i key={i} style={{'--angle':i*20+'deg','--delay':i%4*.07+'s'}}/>)}</div>

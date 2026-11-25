@@ -19,7 +19,6 @@ body:has(.ring-game){margin:0;background:#f6ebce;color:#293f38;font-family:Georg
 .build-prompt h1{font:400 clamp(2.2rem,5.6vw,4.4rem)/1.05 'Agrave Pro',Georgia,serif;margin:5px 0;overflow-wrap:anywhere}
 .build-prompt p{font-size:1rem;line-height:1.4}
 .animal-name{position:absolute;bottom:88px;left:50%;transform:translateX(-50%);background:#fff1cf;padding:6px 15px;border-radius:20px;pointer-events:none}
-.animal-picker{position:absolute;bottom:max(20px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:8px;justify-content:center;max-width:calc(100% - 28px)}
 .celebration-backdrop,.intro-stage,.loading-screen{position:absolute;inset:0;display:grid;place-items:center;z-index:10;padding:24px;background:#faf0d16b;backdrop-filter:blur(4px)}
 .celebration,.intro-card{text-align:center;width:min(710px,100%);position:relative;padding:clamp(24px,4vw,48px);background:#fff3d9f2;border:1px solid #9b764438;border-radius:30px;box-shadow:0 22px 80px #57422924}
 .celebration{animation:feast-pop .5s cubic-bezier(.18,.8,.27,1.2)}
@@ -138,5 +137,13 @@ body[data-nest-demo] .gravy-effects{display:none!important}
 .tutorial-equation>span:first-of-type{opacity:1}
 .tutorial-equation .revealed{animation:feast-pop .35s ease both}
 .tutorial-confetti{z-index:4;left:50%;top:50%}
-.tutorial-actions{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:41}
-@media(max-width:650px){.onboarding-copy{top:78px;padding:0 16px}.onboarding-copy p{font-size:.88rem}.onboarding-copy h2{font-size:1.65rem}.tutorial-actions{bottom:18px}}
+.tutorial-actions,.play-actions{display:flex;justify-content:center;margin-top:16px;pointer-events:auto}
+.tutorial-actions button{border-radius:30px}
+.tutorial-actions .primary{background:#963f29;color:#fff3cf;border:0;padding:14px 24px}
+.tutorial-actions .primary:hover:enabled{background:#783425}
+@media(max-width:650px){.onboarding-copy{top:78px;padding:0 16px}.onboarding-copy p{font-size:.88rem}.onboarding-copy h2{font-size:1.65rem}}
+
+.ring-game button{transform-origin:center;transition:scale .36s cubic-bezier(.2,1.8,.35,1)}
+.ring-game button:active:enabled{scale:.93;transition:scale .08s ease-out}
+.ring-game .nest-open-handle:active{scale:1}
+@media(prefers-reduced-motion:reduce){.ring-game button{transition:none}}

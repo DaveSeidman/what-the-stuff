@@ -43,10 +43,10 @@ export default function Onboarding({ready,stack,flight,targets,handleRef,amount,
       <span>How to play · {stage==='combine'?'1':stage==='open'?'2':'3'} of 3</span>
       <h2>{stage==='combine'?'Combine animals to form the word':stage==='open'?'Pull up to open':'Match them all to win!'}</h2>
       {stage==='combine'?<p className="tutorial-equation"><strong>Turducken</strong><span> = </span>{example.map((animal,i)=><React.Fragment key={animal}>{i>0&&<span className={revealed>i?'revealed':''}> + </span>}<span className={revealed>i?'revealed':''}>{animal}</span></React.Fragment>)}</p>:<p>{stage==='open'?'Drag the animal upward to peek inside. Release to let the lids fall back down.':'Make all five combinations. Every animal has a part to play!'}</p>}
+      <div className="tutorial-actions"><button className={stage==='win'?'primary':'secondary'} onClick={onComplete}>{stage==='win'?'Let’s Play':'Skip demo'}</button></div>
     </div>
     {stage==='combine'&&<div className="nest-opening-demo" aria-hidden="true"><div className="demo-baster" ref={cursor}><BasterIcon pressed={pressed}/></div></div>}
     {stage==='combine'&&stack.length===3&&!flight&&<div className="celebration-leaves tutorial-confetti" aria-hidden="true">{Array.from({length:18},(_,i)=><i key={i} style={{'--angle':i*20+'deg','--delay':i%4*.07+'s'}}/>)}</div>}
     {stage==='open'&&<NestOpening forceDemo enabled={ready} handleRef={handleRef} amount={amount} onChange={onChange} onDemoComplete={()=>setStage('win')}/>}
-    <div className="tutorial-actions"><button onClick={onComplete}>{stage==='win'?'Let’s play!':'Skip demo'}</button></div>
   </>;
 }
