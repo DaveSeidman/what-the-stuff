@@ -115,7 +115,7 @@ body:has(.ring-game){margin:0;background:#f6ebce;color:#293f38;font-family:Georg
 .creator-link{left:auto;right:max(16px,env(safe-area-inset-right))}
 @media(max-width:650px){.site-share{left:max(12px,env(safe-area-inset-left));right:auto}.creator-link{right:max(12px,env(safe-area-inset-right))}}
 .ring-game .site-share .share-button{min-height:0;padding:6px 9px;border:0;border-radius:8px;background:#fff3d9d9;color:#49382c;font:400 .75rem system-ui,sans-serif;text-decoration:underline;text-underline-offset:3px}
-.site-share .share-button svg{display:none}
+.site-share .share-button svg{display:block;width:13px;height:13px}
 .site-share{bottom:max(12px,env(safe-area-inset-bottom))}
 
 

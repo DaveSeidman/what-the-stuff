@@ -4,11 +4,12 @@ import {dragOpening,stepOpeningFall} from './openingPhysics';
 
 // The transparent handle tracks the outer doll; pointer capture keeps a drag
 // independent of its changing screen position and of the camera orbit controls.
-export default function NestOpening({enabled,amount,onChange,handleRef}){
+export default function NestOpening({enabled,amount,onChange,handleRef,forceDemo=false,onDemoComplete}){
   const value=useRef(amount),frame=useRef(0),drag=useRef(null),fake=useRef(null);
   const [demo,setDemo]=useState(false),[pressed,setPressed]=useState(false);
   const [hint,setHint]=useState('Drag up to open');
-  const demoShown=useRef(false);
+  const demoShown=useRef(false),completion=useRef(onDemoComplete);
+  completion.current=onDemoComplete;
   value.current=amount;
   const reduced=useRef(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   function cancel(){cancelAnimationFrame(frame.current);frame.current=0;}
@@ -21,7 +22,7 @@ export default function NestOpening({enabled,amount,onChange,handleRef}){
     function tick(now){
       state=stepOpeningFall(state,(now-last)/1000);last=now;
       update(state.height);
-      if(state.done){finishDemo();frame.current=0;return;}
+      if(state.done){finishDemo();frame.current=0;if(forceDemo)completion.current?.();return;}
       frame.current=requestAnimationFrame(tick);
     }
     frame.current=requestAnimationFrame(tick);
@@ -30,7 +31,12 @@ export default function NestOpening({enabled,amount,onChange,handleRef}){
     if(!enabled){cancel();drag.current=null;setPressed(false);finishDemo();return;}
     let seen=false;
     try{seen=sessionStorage.getItem('nest-opening-demo')==='seen';}catch{}
-    if(demoShown.current||seen||reduced.current)return;
+    if(forceDemo&&reduced.current){
+      update(.45);
+      const timer=setTimeout(()=>{update(0);completion.current?.();},1800);
+      return ()=>{clearTimeout(timer);finishDemo();};
+    }
+    if(!forceDemo&&(demoShown.current||seen||reduced.current))return;
     const timer=setTimeout(()=>{
       const rect=handleRef.current?.getBoundingClientRect();
       if(!rect||drag.current)return;
@@ -54,10 +60,10 @@ export default function NestOpening({enabled,amount,onChange,handleRef}){
       frame.current=requestAnimationFrame(tick);
     },650);
     return ()=>{clearTimeout(timer);cancel();drag.current=null;finishDemo();};
-  },[enabled]);
+  },[enabled,forceDemo]);
   useEffect(()=>()=>{cancel();document.body.removeAttribute('data-nest-demo');},[]);
   function start(event){
-    if(!enabled||event.button!==0)return;
+    if(!enabled||forceDemo||event.button!==0)return;
     event.preventDefault();cancel();finishDemo();
     drag.current={id:event.pointerId,y:event.clientY,initial:value.current,
       distance:Math.max(100,Math.min(220,window.innerHeight*.28))};
@@ -75,6 +81,7 @@ export default function NestOpening({enabled,amount,onChange,handleRef}){
     drag.current=null;fall();
   }
   function key(event){
+    if(forceDemo)return;
     if(!['ArrowUp','ArrowDown',' ','Enter','Escape'].includes(event.key))return;
     event.preventDefault();cancel();finishDemo();
     if(event.key==='ArrowUp')update(Math.min(1,value.current+.15));

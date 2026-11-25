@@ -304,6 +304,8 @@ function RingGame({initial}){
   const [missed,setMissed]=useState(initial.missed||false),[score,setScore]=useState(()=>initial.results?.filter(Boolean).length||0),[over,setOver]=useState(initial.over||false);
   const watercolor=watercolorSettings;
   const [intro,setIntro]=useState(initial.mode==='intro');
+  const [onboarding,setOnboarding]=useState(initial.mode!=='intro'&&!initial.nest?.length&&!initial.stack?.length&&!initial.over&&!initial.rounds);
+  const onboarded=useRef(false);
   const gameStarted=useRef(initial.mode==='quiz'?performance.now()-(initial.elapsed||0)*1000:null);
   const openHandle=useRef(null),hoverLabel=useRef(null);
   const legacyRoute=useRef(initial.legacy||false);
@@ -330,6 +332,7 @@ function RingGame({initial}){
         setExplode(0);setFlight(null);busy.current=false;
       }
       if(!nextFree&&(free||gameStarted.current===null)){gameStarted.current=performance.now();setCompletionSeconds(null);}
+      if(!onboarded.current&&(nextFree?nest.count===0:round===0&&results.length===0&&stack.length===0))setOnboarding(true);
       setFree(nextFree);setIntro(false);
     });
   }
@@ -358,7 +361,7 @@ function RingGame({initial}){
   },[closing]);
   const [word,...order]=rounds[round],complete=stack.length===order.length;
   function pick(name){
-    if(intro||busy.current||(!free&&(complete||over))||(free?nest.recent:stack).includes(name))return;
+    if(intro||onboarding||busy.current||(!free&&(complete||over))||(free?nest.recent:stack).includes(name))return;
     setHover('');
     if(!free&&name!==order[stack.length]){setWrongPick({name});setMissed(true);setHint('Try the '+order[stack.length].toLowerCase()+' next.');return;}
     busy.current=true;if(!free)setHint('');setFlight(name);
@@ -386,7 +389,11 @@ function RingGame({initial}){
   }
   function restart(){gameStarted.current=performance.now();setCompletionSeconds(null);setRounds(makeRounds());setResults([]);setRound(0);setScore(0);setStack([]);setMissed(false);setHint('');setOver(false);}
   // Frame the innermost receiver for each new hop so deep nests stay playable.
-  const visibleStack=free?nest.recent:stack;
+  const visibleStack=onboarding?['Turkey','Duck','Chicken']:free?nest.recent:stack;
+  function finishOnboarding(){
+    setExplode(0);setOnboarding(false);onboarded.current=true;
+    if(!free&&round===0&&results.length===0)gameStarted.current=performance.now();
+  }
   const freeName=combinationName(nest.recent);
   const currentRoute=free?freeRoute(nest.recent):quizRoute({rounds,round,stack,results,over,missed,
     elapsed:completionSeconds??(gameStarted.current===null?0:(performance.now()-gameStarted.current)/1000)});
@@ -406,16 +413,16 @@ function RingGame({initial}){
     </section>
     <ShareButton className="site-share" url={intro?undefined:shareUrl(currentRoute)} text={free&&nest.count>0?`Check out the ${freeName} I made at What-the-stuff.com!`:undefined}/>
     <div className="game-brand">What the STUFF!?</div>
-    <button className="help-button" aria-label="Help" disabled={!!flight||closing} onClick={()=>setIntro(true)}>?</button>
-    {!intro&&!free&&<div className="score-tracker" aria-label={`Score ${score} of 5`}>
+    <button className="help-button" aria-label="Help" disabled={!!flight||closing||onboarding} onClick={()=>setIntro(true)}>?</button>
+    {!intro&&!onboarding&&!free&&<div className="score-tracker" aria-label={`Score ${score} of 5`}>
       <span>Score {score} / 5</span><div className="score-dots">{rounds.map((_,i)=><i key={i} aria-label={results[i]===undefined?'Round '+(i+1):results[i]?'Correct':'Completed with help'} className={results[i]===undefined?(i===round?'current':''):results[i]?'won':'helped'}/>)}</div>
     </div>}
     {!intro&&!over&&!(complete&&!free)&&<div className="build-prompt" aria-live="polite">
-      <span>{free?'Let’s get stuffed!':`Combination ${round+1} of 5 · build the`}</span>
-      <FittedName>{free?(nest.count?freeName:'Pick an animal'):word}</FittedName>
-      <p>{flight?flight+' is hopping in…':hint|| (free?'Pick anyone. Keep nesting.':stack.length?stack.join(' + ')+' · Who goes next?':`Choose three animals, starting with ${order[0]}.`)}</p>
+      <span>{onboarding?'A quick peek inside':free?'Let’s get stuffed!':`Combination ${round+1} of 5 · build the`}</span>
+      <FittedName>{onboarding?'Drag up to open':free?(nest.count?freeName:'Pick an animal'):word}</FittedName>
+      <p>{onboarding?'Release to let the lids drop back down.':flight?flight+' is hopping in…':hint|| (free?'Pick anyone. Drag up to peek inside.':stack.length?stack.join(' + ')+' · Who goes next?':`Choose three animals, starting with ${order[0]}.`)}</p>
     </div>}
-    <NestOpening handleRef={openHandle} enabled={!intro&&loaded&&visibleStack.length>0&&!flight&&!closing&&!(!free&&(complete||over))} amount={explode} onChange={setExplode}/>
+    <NestOpening forceDemo={onboarding} onDemoComplete={finishOnboarding} handleRef={openHandle} enabled={!intro&&loaded&&visibleStack.length>0&&!flight&&!closing&&!(!free&&(complete||over))} amount={explode} onChange={setExplode}/>
     {hover&&!intro&&!flight&&<output ref={hoverLabel} className="animal-name">{hover}</output>}
     {!intro&&!over&&<div className="animal-picker">
       {free&&nest.count>0&&<button className="restart-nest" disabled={!!flight||closing} onClick={()=>{setNest({count:0,recent:[]});setExplode(0);setHover('');}}>Restart</button>}
@@ -444,6 +451,6 @@ function RingGame({initial}){
       </div>
     </div>}
     {!loaded&&<Loader/>}
-    <a className="creator-link" href="https://daveseidman.com" target="_blank" rel="noreferrer">made by dave seidman</a>
+    <a className="creator-link" href="https://daveseidman.com" target="_blank" rel="noreferrer">made by dave seidman ↗</a>
   </main>;
 }
