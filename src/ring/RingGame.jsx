@@ -176,7 +176,7 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       }else label.style.visibility='hidden';
     }
     const nesting=stack.length>0;
-    if(flight) elapsed.current+=Math.min(delta,.12);
+    if(flight) elapsed.current+=Math.min(delta,.12)*(tutorialTargets?2.5:1);
     const reactionTime=elapsed.current;
     const time=Math.max(0,reactionTime-.7);
     const smooth=t=>{const u=Math.max(0,Math.min(1,t));return u*u*(3-2*u);};

@@ -4,7 +4,7 @@ import {dragOpening,stepOpeningFall} from './openingPhysics';
 
 // The transparent handle tracks the outer doll; pointer capture keeps a drag
 // independent of its changing screen position and of the camera orbit controls.
-export default function NestOpening({enabled,amount,onChange,handleRef,forceDemo=false,onDemoComplete}){
+export default function NestOpening({enabled,amount,onChange,handleRef,forceDemo=false,onDemoComplete,demoSpeed=1}){
   const value=useRef(amount),frame=useRef(0),drag=useRef(null),fake=useRef(null);
   const [demo,setDemo]=useState(false),[pressed,setPressed]=useState(false);
   const [hint,setHint]=useState('Drag up to open');
@@ -33,7 +33,7 @@ export default function NestOpening({enabled,amount,onChange,handleRef,forceDemo
     try{seen=sessionStorage.getItem('nest-opening-demo')==='seen';}catch{}
     if(forceDemo&&reduced.current){
       update(.45);
-      const timer=setTimeout(()=>{update(0);completion.current?.();},1800);
+      const timer=setTimeout(()=>{update(0);completion.current?.();},1800/demoSpeed);
       return ()=>{clearTimeout(timer);finishDemo();};
     }
     if(!forceDemo&&(demoShown.current||seen||reduced.current))return;
@@ -48,7 +48,7 @@ export default function NestOpening({enabled,amount,onChange,handleRef,forceDemo
       const distance=Math.min(150,window.innerHeight*.22);
       const start=performance.now();
       function tick(now){
-        const t=(now-start)/1000;
+        const t=(now-start)/1000*demoSpeed;
         const progress=Math.max(0,Math.min(1,(t-.45)/1.1));
         const eased=progress*progress*(3-2*progress);
         if(fake.current)fake.current.style.transform=`translate(${x}px,${y-distance*eased}px)`;
@@ -58,9 +58,9 @@ export default function NestOpening({enabled,amount,onChange,handleRef,forceDemo
         else{setHint('Release to close');fall();}
       }
       frame.current=requestAnimationFrame(tick);
-    },650);
+    },650/demoSpeed);
     return ()=>{clearTimeout(timer);cancel();drag.current=null;finishDemo();};
-  },[enabled,forceDemo]);
+  },[enabled,forceDemo,demoSpeed]);
   useEffect(()=>()=>{cancel();document.body.removeAttribute('data-nest-demo');},[]);
   function start(event){
     if(!enabled||forceDemo||event.button!==0)return;
