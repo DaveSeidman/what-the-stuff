@@ -3,7 +3,9 @@ import { writeFile } from 'node:fs/promises';
 const server=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
 try {
   const {animals,animalModel}=await server.ssrLoadModule('/src/ring/animalBuilder.js');
-  for(const name of animals){
+  const requested=process.argv.slice(2);
+  if(requested.some(name=>!animals.includes(name)))throw Error('Unknown animal requested');
+  for(const name of requested.length?requested:animals){
     const geometry=animalModel(name);
     const attributes=Object.entries(geometry.attributes).map(([name,attr])=>({name,itemSize:attr.itemSize,array:new Float32Array(attr.array)}));
     const index=geometry.index ? new Uint32Array(geometry.index.array) : null;

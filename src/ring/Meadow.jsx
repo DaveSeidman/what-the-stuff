@@ -3,6 +3,7 @@ import {useFrame} from '@react-three/fiber';
 import {BufferGeometry,Float32BufferAttribute,DoubleSide} from 'three';
 import {landscape} from '../poster/artwork';
 import {model} from '../poster/sculpture';
+import {animals} from './animals';
 import {printMaterial} from '../poster/printMaterial';
 
 export const summit=-139;
@@ -22,8 +23,8 @@ function grassPatch(){
     const angle=random()*Math.PI*2, r=Math.sqrt(random())*(i<1400?155:420);
     const x=r*Math.cos(angle), z=r*Math.sin(angle), y=ground(x,z)+.22;
     let bare=false;
-    for(let j=0;j<19;j++){
-      const a=j*2*Math.PI/19+.08;
+    for(let j=0;j<animals.length;j++){
+      const a=j*2*Math.PI/animals.length+.08;
       if(Math.hypot(x-120*Math.cos(a),z-120*Math.sin(a))<13){bare=true;break;}
     }
     if(bare)continue;
@@ -44,8 +45,8 @@ function meadow(tools){
   }
   const g=new BufferGeometry();g.setAttribute('position',new Float32BufferAttribute(vertices,3));
   g.setIndex(indices);g.computeVertexNormals();add(g,'#8ca65d');
-  for(let spot=0;spot<19;spot++){
-    const a=spot*2*Math.PI/19+.08,x=120*Math.cos(a),z=120*Math.sin(a);
+  for(let spot=0;spot<animals.length;spot++){
+    const a=spot*2*Math.PI/animals.length+.08,x=120*Math.cos(a),z=120*Math.sin(a);
     const points=[x,ground(x,z)+.08,z],triangles=[];
     for(let j=0;j<=40;j++){
       const angle=j*Math.PI/20,r=12.3+.8*Math.sin(j*2.1+spot);

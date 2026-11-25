@@ -4,7 +4,7 @@ export {animals} from './animals';
 import {animals} from './animals';
 const colors = {Turkey:'#b95d3b',Duck:'sun',Chicken:'cream',Tiger:'orange',Giraffe:'gold',Zebra:'white',Llama:'cream',Kangaroo:'#cb8544',
   Alligator:'pine',Crocodile:'#84994c',Chameleon:'#96b851',Iguana:'green',Tortoise:'#738c50',Lobster:'red',
-  Crab:'orange',Octopus:'#ac5676',Salmon:'#76a59b',Ostrich:'plum',Penguin:'dark'};
+  Crab:'orange',Octopus:'#ac5676',Salmon:'#76a59b',Ostrich:'plum',Penguin:'dark',Pig:'#e9a0a0'};
 
 const bellyRadius = 16;
 const bellyY = 18;
@@ -55,7 +55,7 @@ function sculpt(name,{egg},features) {
     oval(2,33,0,4,3,2.5,'pine'); eyes(-12,23,9); return;
   }
   if(['Turkey','Duck','Chicken','Penguin','Ostrich'].includes(name)){
-    const headColor={Turkey:'flame',Duck:'green',Chicken:'white',Penguin:'dark',Ostrich:'#ebbe91'}[name];
+    const headColor={Turkey:'flame',Duck:'green',Chicken:'white',Penguin:'dark',Pig:'#e9a0a0',Ostrich:'#ebbe91'}[name];
     const y=name==='Ostrich'?35:32;
     if(name==='Ostrich') oval(-9,30,0,5,9,5,headColor,-10);
     const headX=name==='Penguin'?0:-10;
@@ -72,6 +72,26 @@ function sculpt(name,{egg},features) {
     }
     if(name==='Chicken') for(let i=-1;i<=1;i++) oval(-10+i*3.7,40-Math.abs(i),0,3,3.5,2.5,'red');
     if(name==='Penguin') oval(-10,18,0,7,11,10,'white');
+    return;
+  }
+  if(name==='Pig'){
+    oval(-10,31,0,10,9,9);
+    oval(-20,29,0,6,4.6,6,'#edb2af');
+    for(const side of [-1,1]){
+      oval(-25.3,29,side*2.5,.9,1.2,.9,'#914e59');
+      oval(-7,39,side*6,4,6,3.3,fur,side*22);
+      oval(-8,39.5,side*6.5,2.4,3.6,1.8,'#d77f8c',side*22);
+      oval(-5,18,side*13,4.4,6,3.6,fur,-20);
+      for(const x of [-7,7]){
+        oval(x,4,side*8,4.7,4,4.4);
+        oval(x-1,2,side*8,4.3,2,4,'#6b4245');
+      }
+    }
+    eyes(-14,33,7.3);
+    for(let i=0;i<=13;i++){
+      const t=i/13,angle=Math.PI+t*Math.PI*2.1,radius=4-t*2.3;
+      oval(19+radius*Math.cos(angle),18+radius*Math.sin(angle),0,1.5,1.5,1.5,'#db8997');
+    }
     return;
   }
   if(name==='Chameleon'){
