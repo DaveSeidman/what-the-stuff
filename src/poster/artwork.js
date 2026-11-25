@@ -73,7 +73,7 @@ export function landscape({egg,box,cone,add},{ring=false,propHeight=hillHeight}=
       const side=i<14?1:-1,along=i<14?(i-6.5)*1.85:(i-17.5)*2.1;
       if(side===1&&Math.abs(along)<5.5)continue;
       const px=x+along*size,pz=z+side*(8.8+(i%3)*.3)*size,py=propHeight(px,pz);
-      const scale=size*(.45+(i%4)*.09);
+      const scale=size*(.7+(i%4)*.12);
       egg([px,py+.28*scale,pz],[1.1*scale,.55*scale,.55*scale],i%3?'green':'pine');
       for(let blade=0;blade<3;blade++)cone([px+(blade-1)*.4*scale,py+.75*scale,pz],.02*scale,.18*scale,1.5*scale,i%2?'green':'gold',8,[0,0,(blade-1)*18]);
     }
@@ -105,13 +105,17 @@ export function landscape({egg,box,cone,add},{ring=false,propHeight=hillHeight}=
       const angle=i*Math.PI*2/36;
       const radius=(5.4+(i%3)*.18)*siloSize;
       const px=x+23*siloSize+Math.cos(angle)*radius,pz=z-4*siloSize+Math.sin(angle)*radius;
-      const py=propHeight(px,pz),scale=siloSize*(.36+(i%5)*.055);
+      const py=propHeight(px,pz),scale=siloSize*(.55+(i%5)*.08);
       egg([px,py+.3*scale,pz],[.9*scale,.6*scale,.75*scale],i%3?'green':'pine');
       for(let blade=0;blade<3;blade++)cone([px+(blade-1)*.32*scale,py+.7*scale,pz],.02*scale,.14*scale,1.4*scale,i%2?'green':'gold',8,[0,0,(blade-1)*20]);
     }
+    for(const [dx,dz,scale] of [[-13,9.5,1.1],[-10.5,10.1,.8],[11.8,9.8,1.2],[13,-8.8,1],[21,2,.85],[28,-8,.9]]){
+      const px=x+dx*size,pz=z+dz*size,py=propHeight(px,pz);
+      egg([px,py+.25*size*scale,pz],[1.05*size*scale,.48*size*scale,.75*size*scale],dx%2?'#827e6a':'#a09a80');
+    }
     for(const side of [-1,1])for(let i=0;i<16;i++){
       const px=x+side*(12.7+(i%3)*.22)*size,pz=z+(-8+i*1.08)*size;
-      const py=propHeight(px,pz),scale=size*(.35+(i%4)*.07);
+      const py=propHeight(px,pz),scale=size*(.55+(i%4)*.1);
       egg([px,py+.3*scale,pz],[.7*scale,.6*scale,.95*scale],i%3?'green':'pine');
     }
   }
