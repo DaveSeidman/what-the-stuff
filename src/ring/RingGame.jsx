@@ -494,6 +494,6 @@ function RingGame({initial}){
       </div>
     </div>}
     {!loaded&&<Loader/>}
-    <a className="creator-link" href="https://daveseidman.com" target="_blank" rel="noreferrer"><span className="creator-name">made by dave</span> <span aria-hidden="true">↗</span></a>
+    <a className="creator-link" href="https://daveseidman.com" target="_blank" rel="noreferrer"><span className="creator-name"><strong>made</strong>by<strong>dave</strong></span> <span aria-hidden="true">↗</span></a>
   </main>;
 }
