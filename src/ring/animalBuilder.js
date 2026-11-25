@@ -4,7 +4,7 @@ export {animals} from './animals';
 import {animals} from './animals';
 const colors = {Turkey:'#b95d3b',Duck:'sun',Chicken:'cream',Tiger:'orange',Giraffe:'gold',Zebra:'white',Llama:'cream',Kangaroo:'#cb8544',
   Alligator:'pine',Crocodile:'#84994c',Chameleon:'#96b851',Iguana:'green',Tortoise:'#738c50',Lobster:'red',
-  Crab:'#936344',Octopus:'#ac5676',Salmon:'#76a59b',Ostrich:'plum',Penguin:'dark',Pig:'#e9a0a0'};
+  Crab:'#c77a52',Octopus:'#ac5676',Salmon:'#76a59b',Ostrich:'plum',Penguin:'dark',Pig:'#e9a0a0'};
 
 const bellyRadius = 16;
 const bellyY = 18;
@@ -144,6 +144,10 @@ function sculpt(name,{egg,cone},features) {
   oval(-10,y,0,10,9,9);
   oval(-17,y-2,0,5.5,4.5,6,name==='Zebra'?'dark':'cream');
   eyes(-14.6,y+1.7,7);
+  if(name==='Tiger'){
+    oval(-21.5,y-.7,0,2.1,1.5,2.5,'#50372d');
+    for(const side of [-1,1])oval(-19.8,y-3,side*2.5,2.5,2,2.5,'white');
+  }
   paws();
   for(const side of [-1,1]){
     oval(-8,y+7,side*5,3.4,longEars?6.6:3.8,3.2);

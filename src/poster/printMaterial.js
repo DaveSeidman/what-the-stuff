@@ -136,7 +136,9 @@ export function printMaterial() {
         }
         if(surface>10.5 && surface<11.5){
           float stripes=sin(body.x*1.15+sin(body.y*.37+body.z*.2)*1.4);
-          ink=mix(ink,vec3(.035,.026,.018),smoothstep(.45,.62,stripes)*coloredSkin*.9);
+          float orangeFur=smoothstep(.025,.16,ink.r-ink.g)*smoothstep(.03,.14,ink.r-ink.b);
+          float faceFade=smoothstep(-16.,-9.,body.x);
+          ink=mix(ink,vec3(.035,.026,.018),smoothstep(.45,.62,stripes)*orangeFur*faceFade*.9);
         }
         if(surface>11.5 && surface<12.5){
           float patches=smoothstep(.05,.12,hexEdge((body.xy+body.z*vec2(.3,.2))/5.5));
