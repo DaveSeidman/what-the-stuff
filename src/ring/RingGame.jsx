@@ -13,6 +13,7 @@ import {Doll,shellFor,nestingPlaces,explodedOffsets} from './Doll';
 import Loader from './Loader';
 import ShareButton from './ShareButton';
 import FittedName from './FittedName';
+import NestOpening from './NestOpening';
 import {readRoute,freeRoute,quizRoute,shareUrl} from './routes';
 const watercolorSettings={enabled:true,spill:12,strength:.69,pooling:.36,paperScale:1.75,wetness:.80,depthProtection:.85};
 import './ring.css';
@@ -35,7 +36,7 @@ function openingEase(progress){
   const t=(low+high)/2;
   return 3*(1-t)*t*t+t*t*t;
 }
-function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,explodeAnchor,explodeDragging,hover,hoverLabel,wrongPick}){
+function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,openHandle,hover,hoverLabel,wrongPick}){
   const {camera,size,gl}=useThree();
   const hoverPoint=useMemo(()=>new Vector3(),[]);
   const anchorPoint=useMemo(()=>new Vector3(),[]),cameraRight=useMemo(()=>new Vector3(),[]);
@@ -170,16 +171,21 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       ? previousPlaces[0].scale+(places[0].scale-previousPlaces[0].scale)*outerGrow
       : 1;
     const bellyCenter=places.length?shells[places[0].index].seam*outerScale:0;
-    if(explodeAnchor.current&&!explodeDragging.current){
-      const width=places.length?Math.max(...places.map(p=>shells[p.index].width*p.scale)):40;
-      const height=places.length?shells[places[0].index].height*outerScale:40;
-      anchorPoint.set(0,summit+height/2+(spread.height-height)*explode/2,0);
-      cameraRight.setFromMatrixColumn(camera.matrixWorld,0).multiplyScalar(width/2+25);
-      anchorPoint.add(cameraRight).project(camera);
-      const control=explodeAnchor.current;
-      const x=Math.max(34,Math.min(size.width-34,(anchorPoint.x+1)*size.width/2));
-      const y=Math.max(220,Math.min(size.height-140,(1-anchorPoint.y)*size.height/2));
-      control.style.left=`${x}px`;control.style.top=`${y}px`;
+    if(openHandle.current&&stack.length){
+      const height=shells[places[0].index].height*outerScale;
+      const radius=shells[places[0].index].width*outerScale*1.35;
+      anchorPoint.set(0,summit+height,0).project(camera);
+      const top=(1-anchorPoint.y)*size.height/2;
+      anchorPoint.set(0,summit,0).project(camera);
+      const bottom=(1-anchorPoint.y)*size.height/2;
+      const x=(anchorPoint.x+1)*size.width/2;
+      cameraRight.setFromMatrixColumn(camera.matrixWorld,0).multiplyScalar(radius);
+      anchorPoint.set(0,summit+height/2,0).add(cameraRight).project(camera);
+      const halfWidth=Math.max(24,Math.abs((anchorPoint.x+1)*size.width/2-x));
+      const handle=openHandle.current;
+      handle.style.left=`${x-halfWidth}px`;handle.style.top=`${top}px`;
+      handle.style.width=`${halfWidth*2}px`;handle.style.height=`${Math.max(44,bottom-top)}px`;
+      handle.style.visibility='visible';
     }
     const lidHeights=[];
     let lidHeight=flight?shells[animals.indexOf(flight)].height-shells[animals.indexOf(flight)].seam+24:36;
@@ -299,7 +305,7 @@ function RingGame({initial}){
   const watercolor=watercolorSettings;
   const [intro,setIntro]=useState(initial.mode==='intro');
   const gameStarted=useRef(initial.mode==='quiz'?performance.now()-(initial.elapsed||0)*1000:null);
-  const explodeAnchor=useRef(null),hoverLabel=useRef(null),explodeDragging=useRef(false);
+  const openHandle=useRef(null),hoverLabel=useRef(null);
   const [completionSeconds,setCompletionSeconds]=useState(initial.over?initial.elapsed:null);
   const [leaving,setLeaving]=useState('');
   const [wrongPick,setWrongPick]=useState(null);
@@ -391,7 +397,7 @@ function RingGame({initial}){
   return <main className="ring-game">
     <section className="pasture" aria-label={free?'Free nesting animal ring':'Animal ring. Build '+word}>
       <Canvas shadows={{type:PCFShadowMap}} flat dpr={[1,1.4]} camera={{fov:50,near:1,far:9000}}>
-        <Suspense fallback={null}><World wrongPick={wrongPick} hover={hover} hoverLabel={hoverLabel} explodeAnchor={explodeAnchor} explodeDragging={explodeDragging} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
+        <Suspense fallback={null}><World wrongPick={wrongPick} hover={hover} hoverLabel={hoverLabel} openHandle={openHandle} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
       </Canvas>
     </section>
     <ShareButton className="site-share" url={intro?undefined:shareUrl(currentRoute)} text={free&&nest.count>0?`Check out the ${freeName} I made at What-the-stuff.com!`:undefined}/>
@@ -405,18 +411,7 @@ function RingGame({initial}){
       <FittedName>{free?(nest.count?freeName:'Pick an animal'):word}</FittedName>
       <p>{flight?flight+' is hopping in…':hint|| (free?'Pick anyone. Keep nesting.':stack.length?stack.join(' + ')+' · Who goes next?':`Choose three animals, starting with ${order[0]}.`)}</p>
     </div>}
-    {!intro&&visibleStack.length>0&&<label ref={explodeAnchor} className="explode-control">
-      <input aria-label="Explode animal nest" type="range" min="0" max="100" value={Math.round(explode*100)}
-        disabled={!!flight||closing}
-        onPointerDown={e=>{explodeDragging.current=true;e.currentTarget.setPointerCapture(e.pointerId);}}
-        onPointerUp={()=>{explodeDragging.current=false;}}
-        onPointerCancel={()=>{explodeDragging.current=false;}}
-        onLostPointerCapture={()=>{explodeDragging.current=false;}}
-        onKeyDown={()=>{explodeDragging.current=true;}}
-        onKeyUp={()=>{explodeDragging.current=false;}}
-        onBlur={()=>{explodeDragging.current=false;}}
-        onChange={e=>setExplode(Number(e.target.value)/100)}/>
-    </label>}
+    <NestOpening handleRef={openHandle} enabled={!intro&&loaded&&visibleStack.length>0&&!flight&&!closing&&!(!free&&(complete||over))} amount={explode} onChange={setExplode}/>
     {hover&&!intro&&!flight&&<output ref={hoverLabel} className="animal-name">{hover}</output>}
     {!intro&&!over&&<div className="animal-picker">
       {free&&nest.count>0&&<button className="restart-nest" disabled={!!flight||closing} onClick={()=>{setNest({count:0,recent:[]});setExplode(0);setHover('');}}>Restart</button>}
@@ -438,7 +433,7 @@ function RingGame({initial}){
         <h1 id="intro-title">What the<br/>STUFF!?</h1>
         <h2><em>Stuffing's</em> the Best Part of Thanksgiving!</h2>
         <div className="intro-actions">
-          <button autoFocus disabled={!!leaving} onClick={()=>chooseMode(false)}>Let’s get stuffing!</button>
+          <button disabled={!!leaving} onClick={()=>chooseMode(false)}>Let’s get stuffing!</button>
           <button className="secondary" disabled={!!leaving} onClick={()=>chooseMode(true)}>Free Play</button>
         </div>
         <p className="intro-history">Inspired by engastration, the real tradition of nesting one animal inside another. <a href="https://en.wikipedia.org/wiki/Engastration" target="_blank" rel="noreferrer">Read its history ↗</a></p>

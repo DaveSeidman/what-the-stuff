@@ -35,7 +35,16 @@ export default function BasterCursor(){
   },[]);
   return <div className="gravy-effects" aria-hidden="true">
     <div ref={cursor} className="baster-cursor" style={{visibility:visible?'visible':'hidden'}}>
-      <svg width="22" height="30" viewBox="0 0 22 30">
+      <BasterIcon pressed={pressed}/>
+    </div>
+    {squirts.map(s=><div className="gravy-squirt" key={s.id} style={{left:s.x,top:s.y}}>
+      {[0,1,2,3].map(i=><i key={i} style={{'--dx':(-12-i*4)+'px','--dy':(-20-i*9)+'px','--delay':i*12+'ms'}}/>)}
+    </div>)}
+  </div>;
+}
+
+export function BasterIcon({pressed=false}){
+  return (<svg width="22" height="30" viewBox="0 0 22 30">
         <g transform="translate(1 1) rotate(-25)" stroke="#533a29" strokeWidth="1" strokeLinejoin="round">
           <path d="M0 0 2 8 2.8 18-2.8 18-2 8Z" fill="#e6e1bf"/>
           <path d="M-.9 8-.9 16" fill="none" stroke="#fff6db"/>
@@ -46,10 +55,5 @@ export default function BasterCursor(){
             <path d="M-3.2 21Q-4.2 23-2.6 25" stroke="#e39762" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
           </g>
         </g>
-      </svg>
-    </div>
-    {squirts.map(s=><div className="gravy-squirt" key={s.id} style={{left:s.x,top:s.y}}>
-      {[0,1,2,3].map(i=><i key={i} style={{'--dx':(-12-i*4)+'px','--dy':(-20-i*9)+'px','--delay':i*12+'ms'}}/>)}
-    </div>)}
-  </div>;
+      </svg>);
 }
