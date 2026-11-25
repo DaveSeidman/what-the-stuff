@@ -59,13 +59,13 @@ export function landscape({egg,box,cone,add},{ring=false,propHeight=hillHeight}=
   for(let i=0;i<15;i++) tree(-86+i*12,-206+Math.sin(i)*12,.36+(i%4)*.12,'pine');
   tree(-143,-81,1.05,'orange');tree(-164,-89,1.4,'red');tree(-187,-92,.94,'gold');
   tree(173,-156,.8,'green');tree(183,-160,.65,'pine');
-  const x=ring?260:123,z=ring?-1200:-154,y=propHeight(x,z),size=ring?10:1;
+  const x=ring?260:123,z=ring?-1200:-154,y=propHeight(x,z),size=ring?8.5:1,siloSize=ring?10:1;
   const barnBox=(offset,dimensions,color,rotation)=>box(
     [x+offset[0]*size,y+offset[1]*size,z+offset[2]*size],
     dimensions.map(value=>value*size),color,rotation);
   const barnCone=(offset,top,bottom,height,color)=>cone(
-    [x+offset[0]*size,y+offset[1]*size,z+offset[2]*size],
-    top*size,bottom*size,height*size,color);
+    [x+offset[0]*siloSize,y+offset[1]*siloSize,z+offset[2]*siloSize],
+    top*siloSize,bottom*siloSize,height*siloSize,color);
   barnBox([0,8,0],[25,16,17],'red');
   for(const side of [-1,1]){
     const gable=new BufferGeometry();
@@ -90,18 +90,18 @@ export function landscape({egg,box,cone,add},{ring=false,propHeight=hillHeight}=
   barnBox([6.5,19,0],[16,2,21],'plum',[0,0,-30]);
   barnCone([23,13,-4],4,4.5,26,'red');
   const siloRoof=new SphereGeometry(1,32,16,0,Math.PI*2,0,Math.PI/2);
-  add(siloRoof,'#aab5b4',[x+23*size,y+26*size,z-4*size],[5.2*size,4*size,5.2*size]);
+  add(siloRoof,'#aab5b4',[x+23*siloSize,y+26*siloSize,z-4*siloSize],[5.2*siloSize,4*siloSize,5.2*siloSize]);
   // Narrow raised seams give the rounded cap its standing-seam metal finish.
   for(let rib=0;rib<12;rib++){
     const angle=rib*Math.PI/6;
     const points=[];
     for(let step=0;step<=16;step++){
       const theta=step*Math.PI/32;
-      points.push(new Vector3(x+(23+5.23*Math.sin(theta)*Math.cos(angle))*size,
-        y+(26+4.03*Math.cos(theta))*size,
-        z+(-4+5.23*Math.sin(theta)*Math.sin(angle))*size));
+      points.push(new Vector3(x+(23+5.23*Math.sin(theta)*Math.cos(angle))*siloSize,
+        y+(26+4.03*Math.cos(theta))*siloSize,
+        z+(-4+5.23*Math.sin(theta)*Math.sin(angle))*siloSize));
     }
-    add(new TubeGeometry(new CatmullRomCurve3(points),24,.045*size,5,false),'#75898b');
+    add(new TubeGeometry(new CatmullRomCurve3(points),24,.045*siloSize,5,false),'#75898b');
   }
 }
 

@@ -306,6 +306,7 @@ function RingGame({initial}){
   const [intro,setIntro]=useState(initial.mode==='intro');
   const gameStarted=useRef(initial.mode==='quiz'?performance.now()-(initial.elapsed||0)*1000:null);
   const openHandle=useRef(null),hoverLabel=useRef(null);
+  const legacyRoute=useRef(initial.legacy||false);
   const [completionSeconds,setCompletionSeconds]=useState(initial.over?initial.elapsed:null);
   const [leaving,setLeaving]=useState('');
   const [wrongPick,setWrongPick]=useState(null);
@@ -391,7 +392,10 @@ function RingGame({initial}){
     elapsed:completionSeconds??(gameStarted.current===null?0:(performance.now()-gameStarted.current)/1000)});
   useEffect(()=>{
     if(intro)return;
-    if(window.location.hash!==currentRoute)window.history.pushState(null,'',currentRoute);
+    if(window.location.hash!==currentRoute){
+      window.history[legacyRoute.current?'replaceState':'pushState'](null,'',currentRoute);
+      legacyRoute.current=false;
+    }
   },[intro,free,nest.recent,rounds,round,stack,results,over,missed,completionSeconds]);
   const ready=useCallback(()=>setLoaded(true),[]);
   return <main className="ring-game">
