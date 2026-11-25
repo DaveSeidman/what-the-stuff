@@ -51,7 +51,8 @@ function slicedDepth(shell,upper,tuck){
   return depth;
 }
 function surfaceFor(name){
-  if(['Turkey','Duck','Chicken','Ostrich','Penguin'].includes(name))return 1;
+  if(name==='Penguin')return 14;
+  if(['Turkey','Duck','Chicken','Ostrich'].includes(name))return 1;
   if(name==='Chameleon')return 3;
   if(name==='Salmon')return 9;
   if(name==='Iguana')return 10;

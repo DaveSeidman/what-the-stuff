@@ -89,6 +89,11 @@ export function printMaterial() {
         if(surface>5.5 && surface<6.5)relief=.24*smoothstep(.015,.13,shellEdge(body))*shellMask;
         if(surface>8.5 && surface<9.5)relief=fishHeight(vPoint);
         if(surface>9.5 && surface<10.5)relief=.19*scaleHeight((vPoint.xy+vPoint.z*vec2(.23,.41))*.7);
+        if(surface>13.5 && surface<14.5){
+          float darkFeathers=1.-smoothstep(.08,.17,max(vInk.r,max(vInk.g,vInk.b)));
+          float barbs=sin(vPoint.x*3.8+vPoint.z*2.7+.3*sin(vPoint.y*.45));
+          relief=.035*barbs*darkFeathers;
+        }
         if(surface>10.5 && surface<11.5)relief=.018*noise(vec2(body.x*4.,body.y*.6+body.z*.9));
         if(surface>11.5 && surface<12.5)relief=.012*noise(vec2(body.x*.7+body.z,body.y*5.));
         if(surface>1.5){
@@ -220,7 +225,7 @@ export function printMaterial() {
           float shine=pow(max(0.,dot(n,normalize(lamp+vec3(0.,0.,1.)))),72.);
           pigment+=vec3(.7,.85,1.)*shine*.65;
         }
-        if(surface>12.5){
+        if(surface>12.5 && surface<13.5){
           vec3 lamp=normalize(vec3(-.4,.7,.6));
           #if NUM_DIR_LIGHTS > 0
             lamp=directionalLights[0].direction;
@@ -228,8 +233,20 @@ export function printMaterial() {
           float shine=pow(max(0.,dot(n,normalize(lamp+vec3(0.,0.,1.)))),35.);
           pigment+=vec3(.65,.8,.51)*shine*.8;
         }
+        if(surface>13.5 && surface<14.5){
+          float darkFeathers=1.-smoothstep(.08,.17,max(ink.r,max(ink.g,ink.b)));
+          vec3 lamp=normalize(vec3(-.4,.7,.6));
+          #if NUM_DIR_LIGHTS > 0
+            lamp=directionalLights[0].direction;
+          #endif
+          float lightAmount=.32+.68*smoothstep(-.25,.85,dot(n,lamp));
+          float shine=pow(max(0.,dot(n,normalize(lamp+vec3(0.,0.,1.)))),48.);
+          vec3 darkPlumage=vec3(.018,.026,.03)*lightAmount+vec3(.3,.38,.4)*shine*.5;
+          pigment=mix(pigment,darkPlumage,darkFeathers);
+        }
         float skip=smoothstep(.78,.96,grain)*.18;
         if(surface<.5 && vType>.5 && vType<3.) skip+=smoothstep(.71,.9,brush)*.105;
+        if(surface>13.5 && surface<14.5)skip*=smoothstep(.08,.17,max(ink.r,max(ink.g,ink.b)));
         pigment=mix(pigment,butter,skip);
         pigment*=surface>.5 ? .98+.04*grain : .96+.065*noise(.14*p);
         if(vType>4.5) {
