@@ -37,7 +37,7 @@ function sculpt(name,{egg,cone},features) {
   }
   oval(0,bellyY,0,bellyRadius,bellyRadius,bellyRadius);
   if(['Crab','Lobster','Octopus'].includes(name)){
-    const octopus=name==='Octopus',claw=name==='Crab'?'#5c9bb4':fur;
+    const octopus=name==='Octopus',claw=name==='Crab'?'#426b7c':fur;
     for(let i=0;i<(octopus?8:6);i++){
       const angle=i*2*Math.PI/(octopus?8:6);
       oval(13*Math.cos(angle),6,13*Math.sin(angle),5,4,5,name==='Crab'?claw:fur);

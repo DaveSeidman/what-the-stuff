@@ -1,5 +1,5 @@
 import React,{useMemo} from 'react';
-import {DoubleSide,FrontSide,BackSide,MeshDepthMaterial,Vector3,SphereGeometry,RingGeometry} from 'three';
+import {DoubleSide,BackSide,MeshDepthMaterial,Vector3,SphereGeometry,RingGeometry} from 'three';
 import {useFrame} from '@react-three/fiber';
 import {model} from '../poster/sculpture';
 import {tuckUniforms,tuckVertex} from './tuck';
@@ -18,7 +18,7 @@ function slicedInk(shell,upper,surface=0){
   const ink=printMaterial();
   ink.vertexShader=tuckVertex(ink.vertexShader);
   Object.assign(ink.uniforms,tuckUniforms(shell));
-  ink.side=FrontSide;
+  ink.side=DoubleSide;
   // Shadow rendering derives its culling from the visible material, even with
   // a custom depth material. Keep both faces in the sliced shadow pass.
   ink.shadowSide=DoubleSide;
