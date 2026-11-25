@@ -19,6 +19,9 @@ function slicedInk(shell,upper,surface=0){
   ink.vertexShader=tuckVertex(ink.vertexShader);
   Object.assign(ink.uniforms,tuckUniforms(shell));
   ink.side=FrontSide;
+  // Shadow rendering derives its culling from the visible material, even with
+  // a custom depth material. Keep both faces in the sliced shadow pass.
+  ink.shadowSide=DoubleSide;
   ink.uniforms.surface.value=surface;
   ink.uniforms.bodyCenter={value:new Vector3(shell.x,shell.seam,0)};
   ink.uniforms.cutHeight={value:shell.seam};
