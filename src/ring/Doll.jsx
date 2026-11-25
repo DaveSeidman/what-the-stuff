@@ -59,7 +59,8 @@ function surfaceFor(name){
   if(name==='Giraffe')return 12;
   if(name==='Tortoise')return 6;
   if(name==='Zebra')return 7;
-  if(['Alligator','Crocodile'].includes(name))return 2;
+  if(name==='Alligator')return 13;
+  if(name==='Crocodile')return 2;
   if(name==='Lobster')return 8;
   if(name==='Crab')return 4;
   return 5;

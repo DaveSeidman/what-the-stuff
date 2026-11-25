@@ -84,7 +84,7 @@ export function printMaterial() {
         vec3 body=vPoint-bodyCenter;
         float shellMask=smoothstep(.025,.12,vInk.r-vInk.g)*smoothstep(-2.,2.,body.y);
         float relief=0.;
-        if(surface>1.5 && surface<3.5)relief=scaleHeight(vPoint.xy+vPoint.z*vec2(.31,.23));
+        if((surface>1.5 && surface<3.5)||surface>12.5)relief=scaleHeight(vPoint.xy+vPoint.z*vec2(.31,.23));
         if(surface>3.5 && surface<4.5)relief=.035*noise((vPoint.xy+vPoint.z*.3)*4.);
         if(surface>5.5 && surface<6.5)relief=.24*smoothstep(.015,.13,shellEdge(body))*shellMask;
         if(surface>8.5 && surface<9.5)relief=fishHeight(vPoint);
@@ -217,6 +217,14 @@ export function printMaterial() {
           #endif
           float shine=pow(max(0.,dot(n,normalize(lamp+vec3(0.,0.,1.)))),72.);
           pigment+=vec3(.7,.85,1.)*shine*.65;
+        }
+        if(surface>12.5){
+          vec3 lamp=normalize(vec3(-.4,.7,.6));
+          #if NUM_DIR_LIGHTS > 0
+            lamp=directionalLights[0].direction;
+          #endif
+          float shine=pow(max(0.,dot(n,normalize(lamp+vec3(0.,0.,1.)))),35.);
+          pigment+=vec3(.65,.8,.51)*shine*.8;
         }
         float skip=smoothstep(.78,.96,grain)*.18;
         if(surface<.5 && vType>.5 && vType<3.) skip+=smoothstep(.71,.9,brush)*.105;

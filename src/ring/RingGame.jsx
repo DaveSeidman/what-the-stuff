@@ -39,7 +39,7 @@ function openingEase(progress){
   const t=(low+high)/2;
   return 3*(1-t)*t*t+t*t*t;
 }
-function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,openHandle,hover,hoverLabel,wrongPick,tutorialTargets}){
+function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress,closeFrom,onReady,watercolor,openHandle,hover,hoverLabel,wrongPick,tutorialTargets,departing,onDeparted}){
   const {camera,size,gl}=useThree();
   const hoverPoint=useMemo(()=>new Vector3(),[]);
   const anchorPoint=useMemo(()=>new Vector3(),[]),cameraRight=useMemo(()=>new Vector3(),[]);
@@ -63,6 +63,8 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
   useLayoutEffect(()=>{
     if(wrongPick&&!reducedMotion)wrongReactions.current.set(animals.indexOf(wrongPick.name),0);
   },[wrongPick,reducedMotion]);
+  const departure=useRef(),departureTime=useRef(0);
+  useLayoutEffect(()=>{departureTime.current=0;},[departing]);
   const flyer=useRef(),elapsed=useRef(0),landed=useRef(false);
   useLayoutEffect(()=>{
     camera.up.set(0,1,0);
@@ -237,6 +239,13 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       if(resting)center.position.y+=Math.pow(Math.max(0,Math.sin(phase)),4)*1.5;
 
     }
+    if(departing&&departure.current){
+      departureTime.current+=Math.min(delta,.06);
+      const t=Math.min(1,departureTime.current/.85),ease=openingEase(t),dest=ring[animals.indexOf(departing)];
+      departure.current.position.set(dest.x*ease,summit+(dest.y-summit)*ease+24*Math.sin(Math.PI*t),dest.z*ease);
+      departure.current.rotation.y=dest.yaw*ease;
+      if(t>=1)onDeparted();
+    }
     if(!flight||landed.current||!flyer.current)return;
     const dest=places[stack.length],p=ring[dest.index];
     const approach=openingEase((time-(nesting ? approachStart : 0))/.98);
@@ -270,7 +279,7 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       shadow-camera-near={50} shadow-camera-far={570} shadow-normalBias={.18} shadow-bias={-.0002}/>
     <Meadow material={ink}/>
     {animals.map((name,i)=>{
-      const p=ring[i];if(name===flight || stack.includes(name))return null;
+      const p=ring[i];if(name===flight || name===departing || stack.includes(name))return null;
       return <group name={"animal-"+name} key={name} ref={el=>{dancers.current[i]=el;}} position={[p.x,p.y,p.z]} rotation={[0,p.yaw,0]}
         onClick={e=>{e.stopPropagation();if(e.delta<=5)onPick(name);}} onPointerOver={e=>{e.stopPropagation();onHover(name);}} onPointerOut={()=>onHover('')}>
         <Doll name={name} geometry={models[i]} shell={shells[i]} lidRef={el=>{heads.current[i]=el;}}/>
@@ -298,6 +307,7 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
           </group>;
         })}
       </group></group>}
+    {departing&&<group ref={departure} name="departing-animal"><Doll name={departing} geometry={models[animals.indexOf(departing)]} shell={shells[animals.indexOf(departing)]}/></group>}
     <PigmentPass finish={1} spill={watercolor.spill} settings={watercolor}/>
   </>;
 }
@@ -326,6 +336,7 @@ function RingGame({initial}){
   const [completionSeconds,setCompletionSeconds]=useState(initial.over?initial.elapsed:null);
   const [leaving,setLeaving]=useState('');
   const [wrongPick,setWrongPick]=useState(null);
+  const [unpacking,setUnpacking]=useState(false),[departing,setDeparting]=useState(null);
   const modalAction=useRef();
   useEffect(()=>{
     if(!leaving)return;
@@ -375,7 +386,7 @@ function RingGame({initial}){
   },[closing]);
   const [word,...order]=rounds[round],complete=stack.length===order.length;
   function pick(name){
-    if(intro||onboarding||busy.current||(!free&&(complete||over))||(free?nest.recent:stack).includes(name))return;
+    if(intro||onboarding||unpacking||busy.current||(!free&&(complete||over))||(free?nest.recent:stack).includes(name))return;
     setHover('');
     if(!free&&name!==order[stack.length]){setWrongPick({name});setMissed(true);setHint('Try the '+order[stack.length].toLowerCase()+' next.');return;}
     busy.current=true;if(!free)setHint('');setFlight(name);
@@ -404,10 +415,20 @@ function RingGame({initial}){
   }
   function restart(){gameStarted.current=performance.now();setCompletionSeconds(null);setRounds(makeRounds());setResults([]);setRound(0);setScore(0);setStack([]);setMissed(false);setHint('');setOver(false);}
   function startOver(){
-    if(flight||closing)return;
+    if(flight||closing||unpacking)return;
     setExplode(0);setHover('');setHint('');
-    if(free)setNest({count:0,recent:[]});else restart();
+    if(free)setUnpacking(true);else restart();
   }
+  useEffect(()=>{
+    if(!unpacking||departing)return;
+    if(!nest.recent.length){setUnpacking(false);return;}
+    const timer=setTimeout(()=>{
+      const name=nest.recent[nest.recent.length-1];
+      setDeparting(name);
+      setNest(previous=>({count:previous.count-1,recent:previous.recent.slice(0,-1)}));
+    },200);
+    return ()=>clearTimeout(timer);
+  },[unpacking,departing,nest.recent]);
   // Frame the innermost receiver for each new hop so deep nests stay playable.
   const visibleStack=onboarding?tutorialStack:free?nest.recent:stack;
   function finishOnboarding(){
@@ -429,7 +450,7 @@ function RingGame({initial}){
   return <main className="ring-game">
     <section className="pasture" aria-label={free?'Free nesting animal ring':'Animal ring. Build '+word}>
       <Canvas shadows={{type:PCFShadowMap}} flat dpr={[1,1.4]} camera={{fov:50,near:1,far:9000}}>
-        <Suspense fallback={null}><World tutorialTargets={onboarding?tutorialTargets:null} wrongPick={wrongPick} hover={hover} hoverLabel={hoverLabel} openHandle={openHandle} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={onboarding?tutorialFlight:flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
+        <Suspense fallback={null}><World departing={departing} onDeparted={()=>setDeparting(null)} tutorialTargets={onboarding?tutorialTargets:null} wrongPick={wrongPick} hover={hover} hoverLabel={hoverLabel} openHandle={openHandle} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={onboarding?tutorialFlight:flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
       </Canvas>
     </section>
     <ShareButton className="site-share" url={intro?undefined:shareUrl(currentRoute)} text={free&&nest.count>0?`Check out the ${freeName} I made at What-the-stuff.com!`:undefined}/>
@@ -442,9 +463,9 @@ function RingGame({initial}){
       <span key={`progress-${free}-${round}`} className="combination-progress">{onboarding?'A quick peek inside':free?'Let’s get stuffed!':`Combination ${round+1} of 5 · build the`}</span>
       <FittedName parts={free?(nest.count?combinationParts(nest.recent):undefined):combinationParts(order)}>{onboarding?'Drag up to open':free?(nest.count?freeName:'Pick an animal'):word}</FittedName>
       <p>{onboarding?'Release to let the lids drop back down.':flight?flight+' is hopping in…':hint|| (free?'Pick anyone. Drag up to peek inside.':stack.length?stack.join(' + ')+' · Who goes next?':`Choose three animals, starting with ${order[0]}.`)}</p>
-      <div className="play-actions"><button className="restart-nest secondary" disabled={!!flight||closing} onClick={startOver}>Start over</button></div>
+      {(!free||nest.count>0||unpacking)&&<div className="play-actions"><button className="restart-nest secondary" disabled={!!flight||closing||unpacking} onClick={startOver}>Start over</button></div>}
     </div>}
-    <NestOpening handleRef={openHandle} enabled={!intro&&!onboarding&&loaded&&visibleStack.length>0&&!flight&&!closing&&!(!free&&(complete||over))} amount={explode} onChange={setExplode}/>
+    <NestOpening handleRef={openHandle} enabled={!intro&&!onboarding&&!unpacking&&loaded&&visibleStack.length>0&&!flight&&!closing&&!(!free&&(complete||over))} amount={explode} onChange={setExplode}/>
     {onboarding&&!intro&&<Onboarding ready={loaded} stack={tutorialStack} flight={tutorialFlight} targets={tutorialTargets} handleRef={openHandle} amount={explode} onChange={setExplode} onPick={setTutorialFlight} onComplete={finishOnboarding}/>}
     {hover&&!intro&&!flight&&<output ref={hoverLabel} className="animal-name">{hover}</output>}
     {!intro&&!free&&(complete||over)&&<div className={"celebration-backdrop "+(leaving==='celebration'?'modal-leaving':'')}>

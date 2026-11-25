@@ -63,10 +63,11 @@ export function combinationParts(nest){
     const parts=index===nest.length-1?lastParts[animal]:(middleParts[animal]||lastParts[animal]);
     return syllable(parts,nest,index);
   }));
+  if(nest[0]==='Crab'&&nest[1]==='Alligator'&&start===1){parts[0]='crab';parts[1]='igator';}
   let name=parts.join('');
   // Keep quiz names playful without spelling out another entire animal.
   // Pig is intentionally allowed: it is also one of the new pork syllables.
-  for(const animal of animals.filter(animal=>animal!=='Pig')){
+  for(const animal of animals.filter(animal=>animal!=='Pig'&&!(animal==='Crab'&&nest[0]==='Crab'&&nest[1]==='Alligator'))){
     const full=animal.toLowerCase();
     while(name.includes(full)){
       const index=name.indexOf(full)+Math.floor(full.length/2);
