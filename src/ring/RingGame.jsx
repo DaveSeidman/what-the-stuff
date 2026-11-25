@@ -63,7 +63,7 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
   useLayoutEffect(()=>{
     if(wrongPick&&!reducedMotion)wrongReactions.current.set(animals.indexOf(wrongPick.name),0);
   },[wrongPick,reducedMotion]);
-  const departure=useRef(),departureTime=useRef(0);
+  const departure=useRef([]),departureTime=useRef(0);
   useLayoutEffect(()=>{departureTime.current=0;},[departing]);
   const flyer=useRef(),elapsed=useRef(0),landed=useRef(false);
   useLayoutEffect(()=>{
@@ -239,12 +239,16 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       if(resting)center.position.y+=Math.pow(Math.max(0,Math.sin(phase)),4)*1.5;
 
     }
-    if(departing&&departure.current){
+    if(departing.length){
       departureTime.current+=Math.min(delta,.06);
-      const t=Math.min(1,departureTime.current/.85),ease=openingEase(t),dest=ring[animals.indexOf(departing)];
-      departure.current.position.set(dest.x*ease,summit+(dest.y-summit)*ease+24*Math.sin(Math.PI*t),dest.z*ease);
-      departure.current.rotation.y=dest.yaw*ease;
-      if(t>=1)onDeparted();
+      departing.forEach((name,i)=>{
+        const object=departure.current[i];if(!object)return;
+        const t=Math.max(0,Math.min(1,(departureTime.current-i*.14)/.85)),ease=openingEase(t),dest=ring[animals.indexOf(name)];
+        object.position.set(dest.x*ease,summit+(dest.y-summit)*ease+24*Math.sin(Math.PI*t),dest.z*ease);
+        object.rotation.y=dest.yaw*ease;
+        object.scale.setScalar(t===0?.001:1);
+      });
+      if(departureTime.current>=.85+(departing.length-1)*.14)onDeparted();
     }
     if(!flight||landed.current||!flyer.current)return;
     const dest=places[stack.length],p=ring[dest.index];
@@ -279,7 +283,7 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
       shadow-camera-near={50} shadow-camera-far={570} shadow-normalBias={.18} shadow-bias={-.0002}/>
     <Meadow material={ink}/>
     {animals.map((name,i)=>{
-      const p=ring[i];if(name===flight || name===departing || stack.includes(name))return null;
+      const p=ring[i];if(name===flight || departing.includes(name) || stack.includes(name))return null;
       return <group name={"animal-"+name} key={name} ref={el=>{dancers.current[i]=el;}} position={[p.x,p.y,p.z]} rotation={[0,p.yaw,0]}
         onClick={e=>{e.stopPropagation();if(e.delta<=5)onPick(name);}} onPointerOver={e=>{e.stopPropagation();onHover(name);}} onPointerOut={()=>onHover('')}>
         <Doll name={name} geometry={models[i]} shell={shells[i]} lidRef={el=>{heads.current[i]=el;}}/>
@@ -307,7 +311,7 @@ function World({stack,flight,onLand,onPick,onHover,explode,closing,closeProgress
           </group>;
         })}
       </group></group>}
-    {departing&&<group ref={departure} name="departing-animal"><Doll name={departing} geometry={models[animals.indexOf(departing)]} shell={shells[animals.indexOf(departing)]}/></group>}
+    {departing.map((name,i)=><group key={name} ref={el=>{departure.current[i]=el;}} name="departing-animal"><Doll name={name} geometry={models[animals.indexOf(name)]} shell={shells[animals.indexOf(name)]}/></group>)}
     <PigmentPass finish={1} spill={watercolor.spill} settings={watercolor}/>
   </>;
 }
@@ -336,7 +340,7 @@ function RingGame({initial}){
   const [completionSeconds,setCompletionSeconds]=useState(initial.over?initial.elapsed:null);
   const [leaving,setLeaving]=useState('');
   const [wrongPick,setWrongPick]=useState(null);
-  const [unpacking,setUnpacking]=useState(false),[departing,setDeparting]=useState(null);
+  const [unpacking,setUnpacking]=useState(false),[departing,setDeparting]=useState([]);
   const modalAction=useRef();
   useEffect(()=>{
     if(!leaving)return;
@@ -420,16 +424,13 @@ function RingGame({initial}){
     if(free)setUnpacking(true);else restart();
   }
   useEffect(()=>{
-    if(!unpacking||departing)return;
+    if(!unpacking||departing.length)return;
     const current=onboarding?tutorialStack:nest.recent;
     if(!current.length){setUnpacking(false);return;}
-    const timer=setTimeout(()=>{
-      setDeparting(current[current.length-1]);
-      if(onboarding)setTutorialStack(previous=>previous.slice(0,-1));
-      else setNest(previous=>({count:previous.count-1,recent:previous.recent.slice(0,-1)}));
-    },200);
-    return ()=>clearTimeout(timer);
-  },[unpacking,departing,nest.recent,onboarding,tutorialStack]);
+    setDeparting([...current].reverse());
+    if(onboarding)setTutorialStack([]);
+    else setNest({count:0,recent:[]});
+  },[unpacking,departing,onboarding,tutorialStack,nest.recent]);
   // Frame the innermost receiver for each new hop so deep nests stay playable.
   const visibleStack=onboarding?tutorialStack:free?nest.recent:stack;
   function finishOnboarding(){
@@ -451,7 +452,7 @@ function RingGame({initial}){
   return <main className="ring-game">
     <section className="pasture" aria-label={free?'Free nesting animal ring':'Animal ring. Build '+word}>
       <Canvas shadows={{type:PCFShadowMap}} flat dpr={[1,1.4]} camera={{fov:50,near:1,far:9000}}>
-        <Suspense fallback={null}><World departing={departing} onDeparted={()=>setDeparting(null)} tutorialTargets={onboarding?tutorialTargets:null} wrongPick={wrongPick} hover={hover} hoverLabel={hoverLabel} openHandle={openHandle} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={onboarding?tutorialFlight:flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
+        <Suspense fallback={null}><World departing={departing} onDeparted={()=>{setDeparting([]);setUnpacking(false);}} tutorialTargets={onboarding?tutorialTargets:null} wrongPick={wrongPick} hover={hover} hoverLabel={hoverLabel} openHandle={openHandle} watercolor={watercolor} closing={closing} closeProgress={closeProgress} closeFrom={closeFrom.current} explode={explode} stack={visibleStack} flight={onboarding?tutorialFlight:flight} onLand={land} onPick={pick} onHover={setHover} onReady={ready}/></Suspense>
       </Canvas>
     </section>
     <ShareButton className="site-share" url={intro?undefined:shareUrl(currentRoute)} text={free&&nest.count>0?`Check out the ${freeName} I made at What-the-stuff.com!`:undefined}/>

@@ -75,6 +75,8 @@ function sculpt(name,{egg,cone},features) {
     if(name==='Turkey'){
       for(let i=-2;i<=2;i++) egg([13,25-Math.abs(i),i*4],[5,10,4.4],i%2?'orange':'gold',[i*18,0,-17],1);
       oval(-16,27,3,2.8,4.8,2.8,'red');
+      oval(-15,40,0,2.5,3.8,2.3,'red',18);
+      oval(-18,37,0,2,3.8,2,'red',-28);
     }
     if(name==='Duck')for(const z of [-3.5,0,3.5])cone([17,20,z],.12,2.7,11,'sun',16,[0,0,-65]);
     if(name==='Chicken') for(let i=-1;i<=1;i++) oval(-10+i*3.7,40-Math.abs(i),0,3,3.5,2.5,'red');
@@ -88,8 +90,8 @@ function sculpt(name,{egg,cone},features) {
     oval(-24.5,29,0,2.3,4.8,6.7,'#f0b3b0');
     for(const side of [-1,1]){
       oval(-26.35,29,side*2.7,.7,1.55,1.15,'#914e59');
-      oval(-7,39,side*6,4,6,3.3,fur,side*22);
-      oval(-8,39.5,side*6.5,2.4,3.6,1.8,'#d77f8c',side*22);
+      oval(-7,38,side*6,4.8,3.5,3.3,fur,side*32);
+      oval(-8,38.2,side*6.5,3,2.1,1.8,'#d77f8c',side*32);
       oval(-5,18,side*13,4.4,6,3.6,fur,-20);
       for(const x of [-7,7]){
         oval(x,4,side*8,4.7,4,4.4);

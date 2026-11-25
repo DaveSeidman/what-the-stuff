@@ -67,6 +67,18 @@ export function landscape({egg,box,cone,add},{ring=false,propHeight=hillHeight}=
     [x+offset[0]*siloSize,y+offset[1]*siloSize,z+offset[2]*siloSize],
     top*siloSize,bottom*siloSize,height*siloSize,color);
   barnBox([0,8,0],[25,16,17],'red');
+  if(ring){
+    // Low shrubs and tufted weeds soften the building's contact with the hill.
+    for(let i=0;i<22;i++){
+      const side=i<14?1:-1,along=i<14?(i-6.5)*1.85:(i-17.5)*2.1;
+      if(side===1&&Math.abs(along)<5.5)continue;
+      const px=x+along*size,pz=z+side*(8.8+(i%3)*.3)*size,py=propHeight(px,pz);
+      const scale=size*(.45+(i%4)*.09);
+      egg([px,py+.28*scale,pz],[1.1*scale,.55*scale,.55*scale],i%3?'green':'pine');
+      for(let blade=0;blade<3;blade++)cone([px+(blade-1)*.4*scale,py+.75*scale,pz],.02*scale,.18*scale,1.5*scale,i%2?'green':'gold',8,[0,0,(blade-1)*18]);
+    }
+  }
+
   for(const side of [-1,1]){
     const gable=new BufferGeometry();
     const corners=side>0?[-12.5,16,8.5,12.5,16,8.5,0,23,8.5]:[12.5,16,-8.5,-12.5,16,-8.5,0,23,-8.5];
