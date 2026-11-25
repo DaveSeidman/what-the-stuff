@@ -157,3 +157,7 @@ body[data-nest-demo] .gravy-effects{display:none!important}
 
 .creator-link{text-decoration:none}
 .creator-name{text-decoration:underline;text-underline-offset:3px}
+
+/* Keep game labels from being selected during rapid clicking or dragging. */
+.ring-game{-webkit-user-select:none;user-select:none}
+.ring-game input,.ring-game textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:text}
