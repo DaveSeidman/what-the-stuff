@@ -201,6 +201,13 @@ export function printMaterial() {
           pigment=mix(pigment,butter,.79*smoothstep(.43,.98,glaze));
         }
         if(vType>3.5) pigment=ink;
+        if(surface>3.5 && surface<4.5){
+          // Tiny pale flecks and a soft sheen suggest the blue crab's shell.
+          float shell=smoothstep(.025,.1,ink.r-ink.b)*smoothstep(.03,.14,ink.g-ink.b);
+          float flecks=smoothstep(.82,.95,noise((vPoint.xy+vPoint.z*.43)*3.2));
+          pigment=mix(pigment,vec3(.7,.72,.54),flecks*shell*.24);
+          pigment*=.94+.1*noise((vPoint.xy+vPoint.z*.22)*.6);
+        }
         if(surface>7.5 && surface<8.5){
           // Lobster carapace: smooth red shell, fine mottling and tail segments.
           vec3 shellPoint=vPoint-bodyCenter;

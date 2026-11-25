@@ -100,6 +100,21 @@ export function landscape({egg,box,cone,add},{ring=false,propHeight=hillHeight}=
   barnBox([0,14,9.2],[3,2.4,.3],'plum');
   barnBox([-6.5,19,0],[16,2,21],'wine',[0,0,30]);
   barnBox([6.5,19,0],[16,2,21],'plum',[0,0,-30]);
+  if(ring){
+    for(let i=0;i<36;i++){
+      const angle=i*Math.PI*2/36;
+      const radius=(5.4+(i%3)*.18)*siloSize;
+      const px=x+23*siloSize+Math.cos(angle)*radius,pz=z-4*siloSize+Math.sin(angle)*radius;
+      const py=propHeight(px,pz),scale=siloSize*(.36+(i%5)*.055);
+      egg([px,py+.3*scale,pz],[.9*scale,.6*scale,.75*scale],i%3?'green':'pine');
+      for(let blade=0;blade<3;blade++)cone([px+(blade-1)*.32*scale,py+.7*scale,pz],.02*scale,.14*scale,1.4*scale,i%2?'green':'gold',8,[0,0,(blade-1)*20]);
+    }
+    for(const side of [-1,1])for(let i=0;i<16;i++){
+      const px=x+side*(12.7+(i%3)*.22)*size,pz=z+(-8+i*1.08)*size;
+      const py=propHeight(px,pz),scale=size*(.35+(i%4)*.07);
+      egg([px,py+.3*scale,pz],[.7*scale,.6*scale,.95*scale],i%3?'green':'pine');
+    }
+  }
   barnCone([23,13,-4],4,4.5,26,'red');
   const siloRoof=new SphereGeometry(1,32,16,0,Math.PI*2,0,Math.PI/2);
   add(siloRoof,'#aab5b4',[x+23*siloSize,y+26*siloSize,z-4*siloSize],[5.2*siloSize,4*siloSize,5.2*siloSize]);
